@@ -10,6 +10,7 @@ namespace Tryhardamere
     {
         static void Main(string[] args)
         {
+            // Lots of credits for this assembly goes to detuks, used his assembly as a template for this :^)
             new Tryhardamere();
         }
     }
