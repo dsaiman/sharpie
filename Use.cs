@@ -24,30 +24,11 @@ namespace Tryhardamere
         {
             if (!Trynda.W.IsReady())
                 return;
-            //Console.WriteLine("use W");
-
-            float trueAARange = Trynda.Player.AttackRange + target.BoundingRadius;
-            float trueERange = target.BoundingRadius + Trynda.W.Range;
-
-            float dist = Trynda.Player.Distance(target);
-            Vector2 dashPos = new Vector2();
-            if (target.IsMoving)
+            var trueAARange = Trynda.Player.AttackRange + target.BoundingRadius;
+            if (Trynda.Player.Distance(target) > trueAARange && Trynda.Player.Distance(target) < Trynda.W.Range)
             {
-                Vector2 tpos = target.Position.To2D();
-                Vector2 path = target.Path[0].To2D() - tpos;
-                path.Normalize();
-                dashPos = tpos + (path * 100);
-            }
-            float targ_ms = (target.IsMoving && Trynda.Player.Distance(dashPos) > dist) ? target.MoveSpeed : 0;
-            float msDif = (Trynda.Player.MoveSpeed - targ_ms) == 0 ? 0.0001f : (Trynda.Player.MoveSpeed - targ_ms);
-            float timeToReach = (dist - trueAARange) / msDif;
-            //Console.WriteLine(timeToReach);
-            if (dist > trueAARange && dist < trueERange)
-            {
-                if (timeToReach > 1.7f || timeToReach < 0.0f)
-                {
-                    Trynda.W.Cast();
-                }
+                if (OutgoingDamage.TimeToReach(target) > 1.7f || OutgoingDamage.TimeToReach(target) < 0.0f)
+                Trynda.W.Cast();
             }
 
         }
@@ -56,36 +37,19 @@ namespace Tryhardamere
         {
             if (!Trynda.E.IsReady())
                 return;
-            //  Console.WriteLine("use E");
-            float trueAARange = Trynda.Player.AttackRange + target.BoundingRadius;
-            float trueERange = target.BoundingRadius + Trynda.E.Range;
-
-            float dist = Trynda.Player.Distance(target);
-            Vector2 movePos = new Vector2();
-            if (target.IsMoving)
+            var trueAARange = Trynda.Player.AttackRange + target.BoundingRadius;
+            var trueERange = target.BoundingRadius + Trynda.E.Range;
+            if (Trynda.Player.Distance(target) > trueAARange && Trynda.Player.Distance(target) < trueERange)
             {
-                Vector2 tpos = target.Position.To2D();
-                Vector2 path = target.Path[0].To2D() - tpos;
-                path.Normalize();
-                movePos = tpos + (path * 100);
-            }
-            float targ_ms = (target.IsMoving && Trynda.Player.Distance(movePos) > dist) ? target.MoveSpeed : 0;
-            float msDif = (Trynda.Player.MoveSpeed - targ_ms) == 0 ? 0.0001f : (Trynda.Player.MoveSpeed - targ_ms);
-            float timeToReach = (dist - trueAARange) / msDif;
-            //  Console.WriteLine(timeToReach);
-            if (dist > trueAARange && dist < trueERange)
-            {
-                if (timeToReach > 1.7f || timeToReach < 0.0f)
-                {
-                    Trynda.E.Cast(Trynda.Player.Position.To2D().Extend(target.Position.To2D(), target.Distance3D(Trynda.Player) + 200));
-                }
+                if (OutgoingDamage.TimeToReach(target) > 1.7f || OutgoingDamage.TimeToReach(target) < 0.0f)
+                Trynda.E.Cast(Trynda.Player.Position.To2D().Extend(target.Position.To2D(), target.Distance3D(Trynda.Player) + 200));
             }
 
         }
 
         public static void UseRSmart()
         {
-            if (!Trynda.R.IsReady() || Trynda.Player.HasBuff("Recall") || Utility.InFountain())
+            if (!Trynda.R.IsReady() || Trynda.Player.HasBuff("Recall") || ObjectManager.Player.InFountain())
                 return;
 
             if ((Trynda.MyHpPerc() <= Tryhardamere.Config.Item("RonHp").GetValue<Slider>().Value) && (Utility.CountEnemysInRange(900) > 0))
@@ -98,6 +62,16 @@ namespace Tryhardamere
                 Trynda.W.Cast();
         }
 
+        public static void UseIgnite(Obj_AI_Hero target)
+        {
+            if (Trynda.IgniteSlot != SpellSlot.Unknown && Trynda.Player.Spellbook.CanUseSpell(Trynda.IgniteSlot) == SpellState.Ready)
+            {
+                if (target.Health <= Trynda.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite) )
+                Trynda.Player.Spellbook.CastSpell(Trynda.IgniteSlot, target);
+            }
+
+        }
+
         public static void UseHydra(Obj_AI_Hero target)
         {
             if (Items.CanUseItem(3074) && target.Distance(Trynda.Player) < 420)
@@ -106,7 +80,7 @@ namespace Tryhardamere
                 Items.UseItem(3077);
         }
 
-        public static void UseHydraLC()
+        public static void UseHydraLc()
         {
             if (Items.CanUseItem(3074))
                 Items.UseItem(3074);

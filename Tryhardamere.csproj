@@ -81,6 +81,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OutgoingDamage.cs" />
     <Compile Include="Use.cs" />
     <Compile Include="IncomingDamage.cs" />
     <Compile Include="Program.cs" />

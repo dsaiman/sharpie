@@ -20,11 +20,16 @@ namespace Tryhardamere
                          // Tower Damage
                      if (sender.Type == GameObjectType.obj_AI_Turret)
                      {
+                        // foreach (InventorySlot t in sender.InventoryItems)
+                        //     Console.WriteLine("Item -> " + t.DisplayName);
+
+                         
+                         Console.WriteLine("Damage: " );
                          incDmg = sender.GetAutoAttackDamage(Trynda.Player);
                          // TODO: Get real Damage
                      }
 
-                         // Minion Damage
+                     // Minion Damage
                      if (sender.Type == GameObjectType.obj_AI_Minion)
                      {
                          incDmg = sender.GetAutoAttackDamage(Trynda.Player);
@@ -55,5 +60,30 @@ namespace Tryhardamere
             }
             return Trynda.Player.Health <= incDmg;
         }
+
+        //public static float GetTowerDamage(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        //{
+        //    int i = 0;
+        //    bool isOuter = false, isInhib = true;
+        //    foreach (InventorySlot t in sender.InventoryItems)
+        //    {
+                
+        //        if (t.DisplayName == "Penetrating Bullets")
+        //        {
+        //            isOuter = true;
+        //            isInhib = false;
+        //            break;
+        //        }
+        //        if (t.DisplayName == "Lightning Rod")
+        //        {
+        //            isOuter = false;
+        //            isInhib = true;
+        //            break;
+        //        }
+        //    }
+        //    return 0f;
+        //}
     }
+
+
 }

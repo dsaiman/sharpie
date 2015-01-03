@@ -46,10 +46,12 @@ namespace Tryhardamere
                
                 //Combo
                 Config.AddSubMenu(new Menu("Combo", "combo"));
-                Config.SubMenu("combo").AddItem(new MenuItem("comboItems", "Use Items")).SetValue(true);
                 Config.SubMenu("combo").AddItem(new MenuItem("useQCombo", "Use Q during combo")).SetValue(true);
                 Config.SubMenu("combo").AddItem(new MenuItem("useWCombo", "Use W")).SetValue(true);
                 Config.SubMenu("combo").AddItem(new MenuItem("useECombo", "Use E")).SetValue(true);
+                Config.SubMenu("combo").AddItem(new MenuItem("comboItems", "Use Items")).SetValue(true);
+                Config.SubMenu("combo").AddItem(new MenuItem("useIgniteCombo", "Use Ignite")).SetValue(true);
+
 
                 //Mixed
                 Config.AddSubMenu(new Menu("Mixed", "mix"));
@@ -112,8 +114,11 @@ namespace Tryhardamere
                     Target = TargetSelector.GetTarget(450, TargetSelector.DamageType.Physical);
                 else
                     Target = TargetSelector.GetTarget(250, TargetSelector.DamageType.Physical);
-
-                Trynda.Combo(Target);
+                if (Target != null)
+                {
+                    Trynda.Combo(Target);
+                }
+                
             }
 
             if (Trynda.Orbwalker.ActiveMode.ToString() == "Mixed")
@@ -152,7 +157,7 @@ namespace Tryhardamere
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (Trynda.Player.IsDead || Utility.InFountain()) return;
+            if (Trynda.Player.IsDead || ObjectManager.Player.InFountain()) return;
                 if (IncomingDamage.isLethal(sender, args))
                 {
                     if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())

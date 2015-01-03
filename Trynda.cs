@@ -18,6 +18,7 @@ namespace Tryhardamere
         public static Spellbook SBook = Player.Spellbook;
         
         public static Orbwalking.Orbwalker Orbwalker;
+        public static SpellSlot IgniteSlot = Player.GetSpellSlot("SummonerDot");
 
         public static SpellDataInst Qdata = SBook.GetSpell(SpellSlot.Q);
         public static SpellDataInst Wdata = SBook.GetSpell(SpellSlot.W);
@@ -33,6 +34,8 @@ namespace Tryhardamere
         {
             if (!target.IsValidTarget())
                 return;
+            if (Tryhardamere.Config.Item("useIgniteCombo").GetValue<bool>())
+                Use.UseIgnite(target);
             if (Tryhardamere.Config.Item("useQCombo").GetValue<bool>())
                 Use.UseQSmart();
             if (Tryhardamere.Config.Item("useWCombo").GetValue<bool>())
@@ -41,6 +44,7 @@ namespace Tryhardamere
                 Use.UseESmart(target);
             if (Tryhardamere.Config.Item("comboItems").GetValue<bool>())
                 Use.UseComboItems(target);
+
         }
 
         public static void Mixed(Obj_AI_Hero target)
@@ -56,7 +60,7 @@ namespace Tryhardamere
         public static void LaneClear(Obj_AI_Hero target)
         {
             if (Tryhardamere.Config.Item("useHydraLC").GetValue<bool>())
-                Use.UseHydraLC();
+                Use.UseHydraLc();
             if (!target.IsValidTarget())
                 return;
             if (Tryhardamere.Config.Item("useW").GetValue<bool>())
