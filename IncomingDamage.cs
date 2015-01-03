@@ -47,7 +47,25 @@ namespace Tryhardamere
                                   spellSlot == SpellSlot.Item3 || spellSlot == SpellSlot.Item4 ||
                                   spellSlot == SpellSlot.Item5 || spellSlot == SpellSlot.Item6)
                          {
-                              incDmg = 100;
+                             incDmg = 200;
+                             if (args.SData.Name.Contains("Bilgewater"))
+                                 incDmg = Damage.GetItemDamage(
+                                     attackerHero, Trynda.Player, Damage.DamageItems.Bilgewater);
+                             if (args.SData.Name.Contains("Ruined"))
+                                 incDmg = Damage.GetItemDamage(
+                                     attackerHero, Trynda.Player, Damage.DamageItems.Botrk);
+                             if (args.SData.Name.Contains("Deathfire"))
+                                 incDmg = Damage.GetItemDamage(
+                                     attackerHero, Trynda.Player, Damage.DamageItems.Dfg);
+                             if (args.SData.Name.Contains("Hextech"))
+                                 incDmg = Damage.GetItemDamage(
+                                     attackerHero, Trynda.Player, Damage.DamageItems.Hexgun);
+                             if (args.SData.Name.Contains("Hydra"))
+                                 incDmg = Damage.GetItemDamage(
+                                     attackerHero, Trynda.Player, Damage.DamageItems.Hydra);
+                             if (args.SData.Name.Contains("Tiamat"))
+                                 incDmg = Damage.GetItemDamage(attackerHero, Trynda.Player, Damage.DamageItems.Tiamat);
+
                          }
                          else if (spellSlot == SpellSlot.Unknown)
                              incDmg = attackerHero.GetAutoAttackDamage(Trynda.Player);
