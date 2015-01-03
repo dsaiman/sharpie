@@ -56,6 +56,8 @@ namespace Tryhardamere
                 //Mixed
                 Config.AddSubMenu(new Menu("Mixed", "mix"));
                 Config.SubMenu("mix").AddItem(new MenuItem("useHydraMix", "Use Hydra")).SetValue(true);
+                Config.SubMenu("mix").AddItem(new MenuItem("harassTower", "Harass Under Tower")).SetValue(true);
+
                
                 //LaneClear
                 Config.AddSubMenu(new Menu("LaneClear", "lClear"));
@@ -76,6 +78,8 @@ namespace Tryhardamere
                 Config.AddSubMenu(new Menu("Drawings", "drawings"));
                 Config.SubMenu("drawings").AddItem(new MenuItem("drawW", "Draw W range")).SetValue(true);
                 Config.SubMenu("drawings").AddItem(new MenuItem("drawE", "Draw E range")).SetValue(true);
+                Config.SubMenu("drawings").AddItem(new MenuItem("drawAAtoKill", "Draw AA to kill")).SetValue(true);
+
 
                 Config.AddToMainMenu();
                 Drawing.OnDraw += OnDraw;
@@ -140,8 +144,18 @@ namespace Tryhardamere
             if (Config.Item("drawE").GetValue<bool>())
                 Drawing.DrawCircle(Trynda.Player.Position, Trynda.E.Range, Color.RoyalBlue);
             if (Config.Item("drawW").GetValue<bool>())
-                Drawing.DrawCircle(Trynda.Player.Position, Trynda.W.Range, Color.Firebrick);
+                Drawing.DrawCircle(Trynda.Player.Position, 820f, Color.Firebrick);
 
+            if (Config.Item("drawAAtoKill").GetValue<bool>())
+            {
+                Target = TargetSelector.GetTarget(1050f, TargetSelector.DamageType.Physical);
+                if (Target != null && Target.IsValid)
+                {
+                    var wts = Drawing.WorldToScreen(Target.Position);
+                    Drawing.DrawText(
+                        wts[0] - 40, wts[1] + 40, Color.White, "Autos To Kill: " + OutgoingDamage.AutosToLethal(Target));
+                }
+            }
         }
 
         private static void OnCreateObject(GameObject sender, EventArgs args)
@@ -158,15 +172,20 @@ namespace Tryhardamere
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (Trynda.Player.IsDead || ObjectManager.Player.InFountain()) return;
+            if (sender.Type == GameObjectType.obj_AI_Turret && args.Target.IsMe)
+            {
+                if (Trynda.E.IsReady() && Config.Item("harassTower").GetValue<bool>() && (Trynda.Orbwalker.ActiveMode.ToString() == "Mixed" || Trynda.Orbwalker.ActiveMode.ToString() == "LaneClear"))
+                    Trynda.E.Cast(Trynda.Player.Position.To2D().Extend(sender.Position.To2D() , -900f ));
+
+            }
                 if (IncomingDamage.isLethal(sender, args))
                 {
                     if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())
                     {
                         Trynda.R.Cast();
-                        return;
                     }
                     if (Config.Item("autoQ").GetValue<bool>() && Trynda.Q.IsReady() &&
-                        !Trynda.Player.HasBuff("Undying Rage"))
+                        !Trynda.Player.HasBuff("Undying Rage") && !Trynda.R.IsReady())
                     {
                         Trynda.Q.Cast();
                     }

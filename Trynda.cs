@@ -26,7 +26,7 @@ namespace Tryhardamere
         public static SpellDataInst Rdata = SBook.GetSpell(SpellSlot.R);
         public static Spell Q = new Spell(SpellSlot.Q, 0);
         public static Spell W = new Spell(SpellSlot.W, 400);
-        public static Spell E = new Spell(SpellSlot.E, 660);
+        public static Spell E = new Spell(SpellSlot.E, 680);
         public static Spell R = new Spell(SpellSlot.R, 0);
 
 
