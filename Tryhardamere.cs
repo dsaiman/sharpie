@@ -45,7 +45,7 @@ namespace Tryhardamere
                 Config.SubMenu("combo").AddItem(new MenuItem("useECombo", "Use E")).SetValue(true);
                 Config.SubMenu("combo").AddItem(new MenuItem("comboItems", "Use Items")).SetValue(true);
                 Config.SubMenu("combo").AddItem(new MenuItem("useIgniteCombo", "Use Ignite")).SetValue(true);
-
+                Config.SubMenu("combo").AddItem(new MenuItem("useSmiteCombo", "Use Smite on champ")).SetValue(true);
 
                 //Mixed
                 Config.AddSubMenu(new Menu("Mixed", "mix"));
@@ -76,6 +76,7 @@ namespace Tryhardamere
 
 
                 Config.AddToMainMenu();
+                Trynda.GetSmiteSlot();
                 Drawing.OnDraw += OnDraw;
                 Game.OnGameUpdate += OnGameUpdate;
 
@@ -209,7 +210,7 @@ namespace Tryhardamere
                         if (IncomingDamage.HeatStacks < 120)
                         {
                             IncomingDamage.HeatStacks = IncomingDamage.HeatStacks + 6;
-                            Console.WriteLine("Heat: " + IncomingDamage.HeatStacks);
+                            //Console.WriteLine("Heat: " + IncomingDamage.HeatStacks);
                         }
                     }
                 }
@@ -221,7 +222,7 @@ namespace Tryhardamere
                     IncomingDamage.StackResetDelay = false;
                     //Console.WriteLine("Warming: " + IncomingDamage.WarmingUpStacks);
                     //Console.WriteLine("Heated: " + IncomingDamage.HeatedUpStacks);
-                    Console.WriteLine("Heat: " + IncomingDamage.HeatStacks);
+                    //Console.WriteLine("Heat: " + IncomingDamage.HeatStacks);
                 }
             }
 

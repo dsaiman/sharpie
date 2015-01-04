@@ -14,11 +14,18 @@ namespace Tryhardamere
     {
         public static Obj_AI_Hero Player = ObjectManager.Player;
 
-        public static Spellbook SBook = Player.Spellbook;
-
         public static Orbwalking.Orbwalker Orbwalker;
-        public static SpellSlot IgniteSlot = Player.GetSpellSlot("SummonerDot");
 
+        public static SpellSlot IgniteSlot = Player.GetSpellSlot("SummonerDot");
+        public static SpellSlot smiteSlot = SpellSlot.Unknown;
+
+        //Credits to Kurisu for Smite Stuff :^)
+        public static readonly int[] SmitePurple = { 3713, 3726, 3725, 3726, 3723 };
+        public static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719 };
+        public static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714 };
+        public static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707 };
+
+        public static Spellbook SBook = Player.Spellbook;
         public static SpellDataInst Qdata = SBook.GetSpell(SpellSlot.Q);
         public static SpellDataInst Wdata = SBook.GetSpell(SpellSlot.W);
         public static SpellDataInst Edata = SBook.GetSpell(SpellSlot.E);
@@ -27,6 +34,8 @@ namespace Tryhardamere
         public static Spell W = new Spell(SpellSlot.W, 400);
         public static Spell E = new Spell(SpellSlot.E, 680);
         public static Spell R = new Spell(SpellSlot.R, 0);
+        public static Spell Smite;
+
 
 
         public static void Combo(Obj_AI_Hero target)
@@ -34,6 +43,10 @@ namespace Tryhardamere
             if (!target.IsValidTarget())
             {
                 return;
+            }
+            if (Tryhardamere.Config.Item("useSmiteCombo").GetValue<bool>())
+            {
+                Use.UseSmiteOnChamp(target);
             }
             if (Tryhardamere.Config.Item("useIgniteCombo").GetValue<bool>())
             {
@@ -99,5 +112,37 @@ namespace Tryhardamere
         {
             return (int) ((Player.Health / Player.MaxHealth) * 100);
         }
+
+        public static string GetSmiteType()
+        {
+            if (SmiteBlue.Any(id => Items.HasItem(id)))
+            {
+                return "s5_summonersmiteplayerganker";
+            }
+            if (SmiteRed.Any(id => Items.HasItem(id)))
+            {
+                return "s5_summonersmiteduel";
+            }
+            if (SmiteGrey.Any(id => Items.HasItem(id)))
+            {
+                return "s5_summonersmitequick";
+            }
+            if (SmitePurple.Any(id => Items.HasItem(id)))
+            {
+                return "itemsmiteaoe";
+            }
+            return "summonersmite";
+        }
+
+        public static void GetSmiteSlot()
+        {
+            foreach (var spell in ObjectManager.Player.Spellbook.Spells.Where(spell => String.Equals(spell.Name, GetSmiteType(), StringComparison.CurrentCultureIgnoreCase)))
+            {
+                smiteSlot = spell.Slot;
+                Smite = new Spell(smiteSlot, 700);
+                return;
+            }
+        }
+
     }
 }

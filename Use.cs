@@ -154,5 +154,16 @@ namespace Tryhardamere
                 Items.UseItem(3077);
             }
         }
+
+        public static void UseSmiteOnChamp(Obj_AI_Hero target)
+        {
+            if (target.IsValidTarget(Trynda.E.Range) && Trynda.smiteSlot != SpellSlot.Unknown &&
+                ObjectManager.Player.Spellbook.CanUseSpell((Trynda.smiteSlot)) == SpellState.Ready &&
+                (Trynda.GetSmiteType() == "s5_summonersmiteplayerganker" ||
+                 Trynda.GetSmiteType() == "s5_summonersmiteduel"))
+            {
+                ObjectManager.Player.Spellbook.CastSpell(Trynda.smiteSlot, target);
+            }
+        }
     }
 }
