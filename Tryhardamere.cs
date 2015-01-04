@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using LeagueSharp;
 using LeagueSharp.Common;
 using System.Drawing;
@@ -12,7 +11,6 @@ namespace Tryhardamere
 {
     internal class Tryhardamere
     {
-
         public const string CharName = "Tryndamere";
 
         public static Menu Config;
@@ -21,29 +19,25 @@ namespace Tryhardamere
 
         public Tryhardamere()
         {
-         
             CustomEvents.Game.OnGameLoad += OnLoad;
-
         }
 
         private static void OnLoad(EventArgs args)
         {
-
             Game.PrintChat("<font color=\"#00BFFF\">Tryhardamere# -</font> Loaded!");
 
             try
             {
-
                 Config = new Menu("Tryndamere", "Tryndamere", true);
                 //Orbwalker
                 Config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
                 Trynda.Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalker"));
-          
+
                 //TS
                 var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
                 TargetSelector.AddToMenu(targetSelectorMenu);
                 Config.AddSubMenu(targetSelectorMenu);
-               
+
                 //Combo
                 Config.AddSubMenu(new Menu("Combo", "combo"));
                 Config.SubMenu("combo").AddItem(new MenuItem("useQCombo", "Use Q during combo")).SetValue(true);
@@ -58,12 +52,12 @@ namespace Tryhardamere
                 Config.SubMenu("mix").AddItem(new MenuItem("useHydraMix", "Use Hydra")).SetValue(true);
                 Config.SubMenu("mix").AddItem(new MenuItem("harassTower", "Harass Under Tower")).SetValue(true);
 
-               
+
                 //LaneClear
                 Config.AddSubMenu(new Menu("LaneClear", "lClear"));
                 Config.SubMenu("lClear").AddItem(new MenuItem("useHydraLC", "Use Hydra")).SetValue(true);
 
-               
+
                 //Utilities
                 Config.AddSubMenu(new Menu("Q and R settings", "utils"));
                 Config.SubMenu("utils").AddItem(new MenuItem("useW", "Use W to trade (no slow check)")).SetValue(false);
@@ -93,12 +87,15 @@ namespace Tryhardamere
             {
                 Game.PrintChat("Oops. Something went wrong with Tryndamere");
             }
-
         }
 
         private static void OnGameUpdate(EventArgs args)
         {
-            if (Trynda.Player.IsDead || MenuGUI.IsChatOpen || Trynda.Player.IsChannelingImportantSpell() || Trynda.Player.IsRecalling()) return;
+            if (Trynda.Player.IsDead || MenuGUI.IsChatOpen || Trynda.Player.IsChannelingImportantSpell() ||
+                Trynda.Player.IsRecalling())
+            {
+                return;
+            }
 
             if (Config.Item("manQ").GetValue<bool>() && Trynda.Orbwalker.ActiveMode.ToString() != "Combo")
             {
@@ -112,17 +109,22 @@ namespace Tryhardamere
 
             if (Trynda.Orbwalker.ActiveMode.ToString() == "Combo")
             {
-                if(Trynda.E.IsReady())
+                if (Trynda.E.IsReady())
+                {
                     Target = TargetSelector.GetTarget(950, TargetSelector.DamageType.Physical);
+                }
                 else if (Trynda.W.IsReady())
+                {
                     Target = TargetSelector.GetTarget(450, TargetSelector.DamageType.Physical);
+                }
                 else
+                {
                     Target = TargetSelector.GetTarget(250, TargetSelector.DamageType.Physical);
+                }
                 if (Target != null)
                 {
                     Trynda.Combo(Target);
                 }
-                
             }
 
             if (Trynda.Orbwalker.ActiveMode.ToString() == "Mixed")
@@ -136,15 +138,18 @@ namespace Tryhardamere
                 Target = TargetSelector.GetTarget(250, TargetSelector.DamageType.Physical);
                 Trynda.LaneClear(Target);
             }
-
         }
 
         private static void OnDraw(EventArgs args)
         {
             if (Config.Item("drawE").GetValue<bool>())
+            {
                 Drawing.DrawCircle(Trynda.Player.Position, Trynda.E.Range, Color.RoyalBlue);
+            }
             if (Config.Item("drawW").GetValue<bool>())
+            {
                 Drawing.DrawCircle(Trynda.Player.Position, 820f, Color.Firebrick);
+            }
 
             if (Config.Item("drawAAtoKill").GetValue<bool>())
             {
@@ -156,34 +161,30 @@ namespace Tryhardamere
                         wts[0] - 40, wts[1] + 40, Color.White, "Autos To Kill: " + OutgoingDamage.AutosToLethal(Target));
                 }
             }
-
         }
 
-        private static void OnCreateObject(GameObject sender, EventArgs args)
-        {
-          
+        private static void OnCreateObject(GameObject sender, EventArgs args) {}
 
-        }
-
-        private static void OnDeleteObject(GameObject sender, EventArgs args)
-        {
-          
-        }
+        private static void OnDeleteObject(GameObject sender, EventArgs args) {}
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (Trynda.Player.IsDead || ObjectManager.Player.InFountain()) return;
-            
-            if (sender.Type == GameObjectType.obj_AI_Turret && args.Target.IsMe)
+            if (Trynda.Player.IsDead || ObjectManager.Player.InFountain())
             {
-                if (Trynda.E.IsReady() && Config.Item("harassTower").GetValue<bool>() && (Trynda.Orbwalker.ActiveMode.ToString() == "Mixed" || Trynda.Orbwalker.ActiveMode.ToString() == "LaneClear"))
-                    Trynda.E.Cast(Trynda.Player.Position.To2D().Extend(sender.Position.To2D() , -900f ));
+                return;
             }
-            
+
             if (sender.Type == GameObjectType.obj_AI_Turret)
             {
                 if (args.Target.IsMe)
                 {
+                    if (Trynda.E.IsReady() && Config.Item("harassTower").GetValue<bool>() &&
+                        (Trynda.Orbwalker.ActiveMode.ToString() == "Mixed" ||
+                        Trynda.Orbwalker.ActiveMode.ToString() == "LaneClear"))
+                    {
+                        Trynda.E.Cast(Trynda.Player.Position.To2D().Extend(sender.Position.To2D(), -900f));
+                    }
+
                     if (IncomingDamage.TowerIsOuter(sender))
                     {
                         if (IncomingDamage.WarmingUpStacks < 2)
@@ -195,7 +196,6 @@ namespace Tryhardamere
                         {
                             IncomingDamage.HeatedUpStacks++;
                             //Console.WriteLine("Heated: " + IncomingDamage.HeatedUpStacks);
-
                         }
                     }
                     if (IncomingDamage.TowerIsInhib(sender))
@@ -217,14 +217,17 @@ namespace Tryhardamere
             }
 
             if (IncomingDamage.isLethal(sender, args))
+            {
+                if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())
                 {
-                    if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())
-                        Trynda.R.Cast();
-                    if (Config.Item("autoQ").GetValue<bool>() && Trynda.Q.IsReady() &&
-                        !Trynda.Player.HasBuff("Undying Rage") && !Trynda.R.IsReady())
-                        Trynda.Q.Cast();            
+                    Trynda.R.Cast();
                 }
-
+                if (Config.Item("autoQ").GetValue<bool>() && Trynda.Q.IsReady() &&
+                    !Trynda.Player.HasBuff("Undying Rage") && !Trynda.R.IsReady())
+                {
+                    Trynda.Q.Cast();
+                }
+            }
         }
     }
 }

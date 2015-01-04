@@ -89,9 +89,13 @@ namespace Tryhardamere
         {
             var towerDamage = sender.CalcDamage(Trynda.Player, Damage.DamageType.Physical, sender.BaseAttackDamage);
             if (TowerIsOuter(sender))
+            {
                 towerDamage = towerDamage * (1 + 0.375f * WarmingUpStacks + 0.25f * HeatedUpStacks);
+            }
             else if (TowerIsInhib(sender))
+            {
                 towerDamage = towerDamage * (1 + 0.0105f * HeatStacks);
+            }
             return towerDamage;
         }
     }

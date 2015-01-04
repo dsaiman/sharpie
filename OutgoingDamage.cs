@@ -21,7 +21,7 @@ namespace Tryhardamere
         public static float TimeToMeleeKill(Obj_AI_Hero target)
         {
             var aspd = Trynda.Player.AttackSpeedMod * 0.67f;
-            return  (float) Math.Round(AutosToLethal(target) / aspd);
+            return (float) Math.Round(AutosToLethal(target) / aspd);
         }
 
         public static float TimeToReach(Obj_AI_Hero target)
@@ -35,19 +35,27 @@ namespace Tryhardamere
                 path.Normalize();
                 movePos = tpos + (path * 100);
             }
-            
+
             float targMs;
             if (target.IsMoving && Trynda.Player.Distance(movePos) > dist)
+            {
                 targMs = target.MoveSpeed;
+            }
             else
+            {
                 targMs = 0f;
-            
+            }
+
             float msDif;
             if (Math.Abs((Trynda.Player.MoveSpeed - targMs)) < 0.01f)
+            {
                 msDif = 0f;
+            }
             else
+            {
                 msDif = Trynda.Player.MoveSpeed - targMs;
-            
+            }
+
             return dist / msDif;
         }
 
@@ -59,9 +67,10 @@ namespace Tryhardamere
         public static float TimeToKill(Obj_AI_Hero target)
         {
             if (IsReachable(target))
+            {
                 return TimeToReach(target) + TimeToMeleeKill(target);
+            }
             return Math.Abs(TimeToReach(target) + TimeToMeleeKill(target));
         }
-
     }
 }
