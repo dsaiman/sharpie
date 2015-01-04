@@ -66,12 +66,12 @@ namespace Tryhardamere
                
                 //Utilities
                 Config.AddSubMenu(new Menu("Q and R settings", "utils"));
-                Config.SubMenu("utils").AddItem(new MenuItem("useW", "Use W to trade (no slow check)")).SetValue(true);
+                Config.SubMenu("utils").AddItem(new MenuItem("useW", "Use W to trade (no slow check)")).SetValue(false);
                 Config.SubMenu("utils").AddItem(new MenuItem("autoQ", "Auto Q")).SetValue(true);
-                Config.SubMenu("utils").AddItem(new MenuItem("manQ", "Manual Q (set %)")).SetValue(true);
+                Config.SubMenu("utils").AddItem(new MenuItem("manQ", "Manual Q (set %)")).SetValue(false);
                 Config.SubMenu("utils").AddItem(new MenuItem("QonHp", "Use Q on % hp")).SetValue(new Slider(25, 1, 99));
                 Config.SubMenu("utils").AddItem(new MenuItem("autoR", "Auto R")).SetValue(true);
-                Config.SubMenu("utils").AddItem(new MenuItem("manR", "Manual R (Set %)")).SetValue(true);
+                Config.SubMenu("utils").AddItem(new MenuItem("manR", "Manual R (Set %)")).SetValue(false);
                 Config.SubMenu("utils").AddItem(new MenuItem("RonHp", "Use R on % hp")).SetValue(new Slider(25, 1, 99));
 
                 //Drawings
@@ -156,6 +156,7 @@ namespace Tryhardamere
                         wts[0] - 40, wts[1] + 40, Color.White, "Autos To Kill: " + OutgoingDamage.AutosToLethal(Target));
                 }
             }
+
         }
 
         private static void OnCreateObject(GameObject sender, EventArgs args)
@@ -172,24 +173,56 @@ namespace Tryhardamere
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (Trynda.Player.IsDead || ObjectManager.Player.InFountain()) return;
+            
             if (sender.Type == GameObjectType.obj_AI_Turret && args.Target.IsMe)
             {
                 if (Trynda.E.IsReady() && Config.Item("harassTower").GetValue<bool>() && (Trynda.Orbwalker.ActiveMode.ToString() == "Mixed" || Trynda.Orbwalker.ActiveMode.ToString() == "LaneClear"))
                     Trynda.E.Cast(Trynda.Player.Position.To2D().Extend(sender.Position.To2D() , -900f ));
-
             }
-                if (IncomingDamage.isLethal(sender, args))
+            
+            if (sender.Type == GameObjectType.obj_AI_Turret)
+            {
+                if (args.Target.IsMe)
+                {
+                    if (IncomingDamage.TowerIsOuter(sender))
+                    {
+                        if (IncomingDamage.WarmingUpStacks < 2)
+                        {
+                            IncomingDamage.WarmingUpStacks++;
+                            //Console.WriteLine("Warming: " + IncomingDamage.WarmingUpStacks);
+                        }
+                        else if (IncomingDamage.HeatedUpStacks < 2)
+                        {
+                            IncomingDamage.HeatedUpStacks++;
+                            //Console.WriteLine("Heated: " + IncomingDamage.HeatedUpStacks);
+
+                        }
+                    }
+                    if (IncomingDamage.TowerIsInhib(sender))
+                    {
+                        if (IncomingDamage.HeatStacks < 120)
+                        {
+                            IncomingDamage.HeatStacks = IncomingDamage.HeatStacks + 6;
+                            //Console.WriteLine("Heat: " + IncomingDamage.HeatStacks);
+                        }
+                    }
+                }
+                else
+                {
+                    IncomingDamage.HeatStacks = 0;
+                    IncomingDamage.HeatedUpStacks = 0;
+                    IncomingDamage.WarmingUpStacks = 0;
+                    //Console.WriteLine("Cooling: " + IncomingDamage.HeatStacks);
+                }
+            }
+
+            if (IncomingDamage.isLethal(sender, args))
                 {
                     if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())
-                    {
                         Trynda.R.Cast();
-                    }
                     if (Config.Item("autoQ").GetValue<bool>() && Trynda.Q.IsReady() &&
                         !Trynda.Player.HasBuff("Undying Rage") && !Trynda.R.IsReady())
-                    {
-                        Trynda.Q.Cast();
-                    }
-            
+                        Trynda.Q.Cast();            
                 }
 
         }

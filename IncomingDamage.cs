@@ -11,6 +11,7 @@ namespace Tryhardamere
 {
     internal class IncomingDamage
     {
+        public static int WarmingUpStacks = 0, HeatedUpStacks = 0, HeatStacks = 0;
         public static bool isLethal(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             double incDmg = 100; 
@@ -20,13 +21,7 @@ namespace Tryhardamere
                          // Tower Damage
                      if (sender.Type == GameObjectType.obj_AI_Turret)
                      {
-                        // foreach (InventorySlot t in sender.InventoryItems)
-                        //     Console.WriteLine("Item -> " + t.DisplayName);
-
-                         
-                         Console.WriteLine("Damage: " );
-                         incDmg = sender.GetAutoAttackDamage(Trynda.Player);
-                         // TODO: Get real Damage
+                         incDmg = GetTowerDamage(sender);
                      }
 
                      // Minion Damage
@@ -79,28 +74,26 @@ namespace Tryhardamere
             return Trynda.Player.Health <= incDmg;
         }
 
-        //public static float GetTowerDamage(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        //{
-        //    int i = 0;
-        //    bool isOuter = false, isInhib = true;
-        //    foreach (InventorySlot t in sender.InventoryItems)
-        //    {
-                
-        //        if (t.DisplayName == "Penetrating Bullets")
-        //        {
-        //            isOuter = true;
-        //            isInhib = false;
-        //            break;
-        //        }
-        //        if (t.DisplayName == "Lightning Rod")
-        //        {
-        //            isOuter = false;
-        //            isInhib = true;
-        //            break;
-        //        }
-        //    }
-        //    return 0f;
-        //}
+        public static bool TowerIsOuter(Obj_AI_Base sender)
+        {
+            return sender.InventoryItems.Any(t => t.DisplayName == "Penetrating Bullets");
+        }
+
+        public static bool TowerIsInhib(Obj_AI_Base sender)
+        {
+            return sender.InventoryItems.Any(t => t.DisplayName == "Lightning Rod");
+        }
+
+
+        public static double GetTowerDamage(Obj_AI_Base sender)
+        {
+            var towerDamage = sender.CalcDamage(Trynda.Player, Damage.DamageType.Physical, sender.BaseAttackDamage);
+            if (TowerIsOuter(sender))
+                towerDamage = towerDamage * (1 + 0.375f * WarmingUpStacks + 0.25f * HeatedUpStacks);
+            else if (TowerIsInhib(sender))
+                towerDamage = towerDamage * (1 + 0.0105f * HeatStacks);
+            return towerDamage;
+        }
     }
 
 
