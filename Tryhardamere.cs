@@ -173,11 +173,17 @@ namespace Tryhardamere
             {
                 return;
             }
-
+            
             if (sender.Type == GameObjectType.obj_AI_Turret)
             {
                 if (args.Target.IsMe)
                 {
+                    if (!IncomingDamage.StackResetDelay)
+                    {
+                        Utility.DelayAction.ActionList.Clear();
+                        Utility.DelayAction.Add(1500, () => IncomingDamage.StackResetDelay = true);
+                    }
+
                     if (Trynda.E.IsReady() && Config.Item("harassTower").GetValue<bool>() &&
                         (Trynda.Orbwalker.ActiveMode.ToString() == "Mixed" ||
                         Trynda.Orbwalker.ActiveMode.ToString() == "LaneClear"))
@@ -203,16 +209,19 @@ namespace Tryhardamere
                         if (IncomingDamage.HeatStacks < 120)
                         {
                             IncomingDamage.HeatStacks = IncomingDamage.HeatStacks + 6;
-                            //Console.WriteLine("Heat: " + IncomingDamage.HeatStacks);
+                            Console.WriteLine("Heat: " + IncomingDamage.HeatStacks);
                         }
                     }
                 }
-                else
+                else if (IncomingDamage.StackResetDelay)
                 {
                     IncomingDamage.HeatStacks = 0;
                     IncomingDamage.HeatedUpStacks = 0;
                     IncomingDamage.WarmingUpStacks = 0;
-                    //Console.WriteLine("Cooling: " + IncomingDamage.HeatStacks);
+                    IncomingDamage.StackResetDelay = false;
+                    //Console.WriteLine("Warming: " + IncomingDamage.WarmingUpStacks);
+                    //Console.WriteLine("Heated: " + IncomingDamage.HeatedUpStacks);
+                    Console.WriteLine("Heat: " + IncomingDamage.HeatStacks);
                 }
             }
 

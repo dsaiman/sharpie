@@ -12,6 +12,8 @@ namespace Tryhardamere
     internal class IncomingDamage
     {
         public static int WarmingUpStacks = 0, HeatedUpStacks = 0, HeatStacks = 0;
+        public static bool StackResetDelay = false;
+
         public static bool isLethal(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             double incDmg = 100; 
@@ -83,7 +85,6 @@ namespace Tryhardamere
         {
             return sender.InventoryItems.Any(t => t.DisplayName == "Lightning Rod");
         }
-
 
         public static double GetTowerDamage(Obj_AI_Base sender)
         {
