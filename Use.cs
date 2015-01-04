@@ -108,13 +108,17 @@ namespace Tryhardamere
 
         public static void UseHydraLc()
         {
-            if (Items.CanUseItem(3074))
+            var minions = MinionManager.GetMinions(Trynda.Player.Position, 420).ToArray();
+            if (minions.Length > 1)
             {
-                Items.UseItem(3074);
-            }
-            if (Items.CanUseItem(3077))
-            {
-                Items.UseItem(3077);
+                if (Items.CanUseItem(3074))
+                {
+                    Items.UseItem(3074);
+                }
+                if (Items.CanUseItem(3077))
+                {
+                    Items.UseItem(3077);
+                }
             }
         }
 
