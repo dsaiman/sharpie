@@ -80,9 +80,9 @@ namespace Tryhardamere
                 Drawing.OnDraw += OnDraw;
                 Game.OnGameUpdate += OnGameUpdate;
 
-                GameObject.OnCreate += OnCreateObject;
-                GameObject.OnDelete += OnDeleteObject;
-                Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
+                Obj_AI_Base.OnProcessSpellCast += MinionSpellCast;
+                Obj_AI_Base.OnProcessSpellCast += HeroSpellCast;
+                Obj_AI_Base.OnProcessSpellCast += TowerSpellCast;
             }
             catch
             {
@@ -164,33 +164,82 @@ namespace Tryhardamere
             }
         }
 
-        private static void OnCreateObject(GameObject sender, EventArgs args) {}
-
-        private static void OnDeleteObject(GameObject sender, EventArgs args) {}
-
-        private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        private static void MinionSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (Trynda.Player.IsDead || ObjectManager.Player.InFountain())
+            if (ObjectManager.Player.IsDead || ObjectManager.Player.InFountain())
             {
                 return;
             }
-            
-            if (sender.Type == GameObjectType.obj_AI_Turret)
+            if (sender.IsEnemy && sender.Type == GameObjectType.obj_AI_Minion)
             {
                 if (args.Target.IsMe)
                 {
-                    if (!IncomingDamage.StackResetDelay)
+                    if (IncomingDamage.MinionIsLethal(sender, args))
                     {
-                        Utility.DelayAction.ActionList.Clear();
-                        Utility.DelayAction.Add(1500, () => IncomingDamage.StackResetDelay = true);
+                        if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())
+                        {
+                            Trynda.R.Cast();
+                        }
+                        if (Config.Item("autoQ").GetValue<bool>() && Trynda.Q.IsReady() &&
+                            !Trynda.Player.HasBuff("Undying Rage") && !Trynda.R.IsReady())
+                        {
+                            Trynda.Q.Cast();
+                        }
                     }
+                }
+            }
+        }
 
+        private static void HeroSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (ObjectManager.Player.IsDead || ObjectManager.Player.InFountain())
+            {
+                return;
+            }
+
+            if (sender.IsEnemy && sender.Type == GameObjectType.obj_AI_Hero)
+            {
+                if (args.Target.IsMe)
+                {
+                    if (IncomingDamage.HeroIsLethal(sender, args))
+                    {
+                        if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())
+                        {
+                            Trynda.R.Cast();
+                        }
+                        if (Config.Item("autoQ").GetValue<bool>() && Trynda.Q.IsReady() &&
+                            !Trynda.Player.HasBuff("Undying Rage") && !Trynda.R.IsReady())
+                        {
+                            Trynda.Q.Cast();
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void TowerSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (ObjectManager.Player.IsDead || ObjectManager.Player.InFountain())
+            {
+                return;
+            }
+
+            if (sender.IsEnemy && sender.Type == GameObjectType.obj_AI_Turret && sender.Distance(ObjectManager.Player) < 2000f)
+            {
+                if (args.Target.IsMe)
+                {
                     if (Trynda.E.IsReady() && Config.Item("harassTower").GetValue<bool>() &&
                         (Trynda.Orbwalker.ActiveMode.ToString() == "Mixed" ||
-                        Trynda.Orbwalker.ActiveMode.ToString() == "LaneClear"))
+                         Trynda.Orbwalker.ActiveMode.ToString() == "LaneClear"))
                     {
                         Trynda.E.Cast(Trynda.Player.Position.To2D().Extend(sender.Position.To2D(), -900f));
                     }
+
+                    //            if (!IncomingDamage.StackResetDelay)
+                    //            {
+                    //                Utility.DelayAction.ActionList.Clear();
+                    //                Utility.DelayAction.Add(1500, () => IncomingDamage.StackResetDelay = true);
+                    //            }
 
                     if (IncomingDamage.TowerIsOuter(sender))
                     {
@@ -213,31 +262,39 @@ namespace Tryhardamere
                             //Console.WriteLine("Heat: " + IncomingDamage.HeatStacks);
                         }
                     }
+                    if (IncomingDamage.TowerIsLethal(sender, args))
+                    {
+                        if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())
+                        {
+                            Trynda.R.Cast();
+                        }
+                        if (Config.Item("autoQ").GetValue<bool>() && Trynda.Q.IsReady() &&
+                            !Trynda.Player.HasBuff("Undying Rage") && !Trynda.R.IsReady())
+                        {
+                            Trynda.Q.Cast();
+                        }
+                    }
                 }
-                else if (IncomingDamage.StackResetDelay)
+                else if (args.Target.IsAlly && args.Target.Type == GameObjectType.obj_AI_Hero)
                 {
-                    IncomingDamage.HeatStacks = 0;
-                    IncomingDamage.HeatedUpStacks = 0;
-                    IncomingDamage.WarmingUpStacks = 0;
-                    IncomingDamage.StackResetDelay = false;
-                    //Console.WriteLine("Warming: " + IncomingDamage.WarmingUpStacks);
-                    //Console.WriteLine("Heated: " + IncomingDamage.HeatedUpStacks);
-                    //Console.WriteLine("Heat: " + IncomingDamage.HeatStacks);
+                    IncomingDamage.ResetTowerWarming();
                 }
-            }
+                else
+                {
+                    IncomingDamage.ResetTowerStacks();
+                }
+                //        else if (IncomingDamage.StackResetDelay)
+                //        {
+                //            IncomingDamage.ResetTowerStacks(); 
+                //            IncomingDamage.StackResetDelay = false
+                //        }
+                //    }
+                //}
 
-            if (IncomingDamage.isLethal(sender, args))
-            {
-                if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())
-                {
-                    Trynda.R.Cast();
-                }
-                if (Config.Item("autoQ").GetValue<bool>() && Trynda.Q.IsReady() &&
-                    !Trynda.Player.HasBuff("Undying Rage") && !Trynda.R.IsReady())
-                {
-                    Trynda.Q.Cast();
-                }
             }
         }
-    }
+
+
+}
+
 }

@@ -14,66 +14,51 @@ namespace Tryhardamere
         public static int WarmingUpStacks = 0, HeatedUpStacks = 0, HeatStacks = 0;
         public static bool StackResetDelay = false;
 
-        public static bool isLethal(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        public static bool MinionIsLethal(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            double incDmg = 100; 
-            if (sender.IsEnemy && args.Target.IsMe)
+            //Console.WriteLine("Damage from Minion: " + sender.GetAutoAttackDamage(ObjectManager.Player));
+            return ObjectManager.Player.Health <= sender.GetAutoAttackDamage(ObjectManager.Player);
+        }
+
+        public static bool TowerIsLethal(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            //Console.WriteLine("Damage from Tower: " + GetTowerDamage(sender));
+            return ObjectManager.Player.Health <= GetTowerDamage(sender);
+        }
+
+        public static bool HeroIsLethal(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            double incDmg;
+            var attackerHero = (Obj_AI_Hero) sender;
+            SpellSlot spellSlot = attackerHero.GetSpellSlot(args.SData.Name);
+            SpellSlot igniteSlot = attackerHero.GetSpellSlot("SummonerDot");
+
+            if (igniteSlot != SpellSlot.Unknown && spellSlot == igniteSlot)
+                incDmg = attackerHero.GetSummonerSpellDamage(ObjectManager.Player, Damage.SummonerSpell.Ignite);
+            else if (spellSlot == SpellSlot.Item1 || spellSlot == SpellSlot.Item2 ||
+                     spellSlot == SpellSlot.Item3 || spellSlot == SpellSlot.Item4 ||
+                     spellSlot == SpellSlot.Item5 || spellSlot == SpellSlot.Item6)
             {
-                 {
-                         // Tower Damage
-                     if (sender.Type == GameObjectType.obj_AI_Turret)
-                     {
-                         incDmg = GetTowerDamage(sender);
-                     }
-
-                     // Minion Damage
-                     if (sender.Type == GameObjectType.obj_AI_Minion)
-                     {
-                         incDmg = sender.GetAutoAttackDamage(Trynda.Player);
-                     }
-
-                         // Player Damage
-                     if (sender.Type == GameObjectType.obj_AI_Hero)
-                     {
-                         Obj_AI_Hero attackerHero = ObjectManager.Get<Obj_AI_Hero>().First(hero => hero.NetworkId == sender.NetworkId);
-                         SpellSlot spellSlot = attackerHero.GetSpellSlot(args.SData.Name);
-                         SpellSlot igniteSlot = attackerHero.GetSpellSlot("SummonerDot");
-                         if (igniteSlot != SpellSlot.Unknown && spellSlot == igniteSlot)
-                             incDmg = attackerHero.GetSummonerSpellDamage(Trynda.Player, Damage.SummonerSpell.Ignite);
-                         else if (spellSlot == SpellSlot.Item1 || spellSlot == SpellSlot.Item2 ||
-                                  spellSlot == SpellSlot.Item3 || spellSlot == SpellSlot.Item4 ||
-                                  spellSlot == SpellSlot.Item5 || spellSlot == SpellSlot.Item6)
-                         {
-                             incDmg = 200;
-                             if (args.SData.Name.Contains("Bilgewater"))
-                                 incDmg = Damage.GetItemDamage(
-                                     attackerHero, Trynda.Player, Damage.DamageItems.Bilgewater);
-                             if (args.SData.Name.Contains("Ruined"))
-                                 incDmg = Damage.GetItemDamage(
-                                     attackerHero, Trynda.Player, Damage.DamageItems.Botrk);
-                             if (args.SData.Name.Contains("Deathfire"))
-                                 incDmg = Damage.GetItemDamage(
-                                     attackerHero, Trynda.Player, Damage.DamageItems.Dfg);
-                             if (args.SData.Name.Contains("Hextech"))
-                                 incDmg = Damage.GetItemDamage(
-                                     attackerHero, Trynda.Player, Damage.DamageItems.Hexgun);
-                             if (args.SData.Name.Contains("Hydra"))
-                                 incDmg = Damage.GetItemDamage(
-                                     attackerHero, Trynda.Player, Damage.DamageItems.Hydra);
-                             if (args.SData.Name.Contains("Tiamat"))
-                                 incDmg = Damage.GetItemDamage(attackerHero, Trynda.Player, Damage.DamageItems.Tiamat);
-
-                         }
-                         else if (spellSlot == SpellSlot.Unknown)
-                             incDmg = attackerHero.GetAutoAttackDamage(Trynda.Player);
-                         else
-                             incDmg = attackerHero.GetSpellDamage(Trynda.Player, spellSlot);
-
-                     }
-
-                 }
+                incDmg = 200;
+                if (args.SData.Name.Contains("Bilgewater"))
+                    incDmg = attackerHero.GetItemDamage(ObjectManager.Player, Damage.DamageItems.Bilgewater);
+                if (args.SData.Name.Contains("Ruined"))
+                    incDmg = attackerHero.GetItemDamage(ObjectManager.Player, Damage.DamageItems.Botrk);
+                if (args.SData.Name.Contains("Deathfire"))
+                    incDmg = attackerHero.GetItemDamage(ObjectManager.Player, Damage.DamageItems.Dfg);
+                if (args.SData.Name.Contains("Hextech"))
+                    incDmg = attackerHero.GetItemDamage(ObjectManager.Player, Damage.DamageItems.Hexgun);
+                if (args.SData.Name.Contains("Hydra"))
+                    incDmg = attackerHero.GetItemDamage(ObjectManager.Player, Damage.DamageItems.Hydra);
+                if (args.SData.Name.Contains("Tiamat"))
+                    incDmg = attackerHero.GetItemDamage(ObjectManager.Player, Damage.DamageItems.Tiamat);
             }
-            return Trynda.Player.Health <= incDmg;
+            else if (spellSlot == SpellSlot.Unknown)
+                incDmg = attackerHero.GetAutoAttackDamage(ObjectManager.Player);
+            else
+                incDmg = attackerHero.GetSpellDamage(ObjectManager.Player, spellSlot);
+            Console.WriteLine("Damage from : " + args.SData.Name + " amount: " + incDmg);
+            return ObjectManager.Player.Health <= incDmg;
         }
 
         public static bool TowerIsOuter(Obj_AI_Base sender)
@@ -88,7 +73,7 @@ namespace Tryhardamere
 
         public static double GetTowerDamage(Obj_AI_Base sender)
         {
-            var towerDamage = sender.CalcDamage(Trynda.Player, Damage.DamageType.Physical, sender.BaseAttackDamage);
+            var towerDamage = sender.CalcDamage(ObjectManager.Player, Damage.DamageType.Physical, sender.BaseAttackDamage);
             if (TowerIsOuter(sender))
             {
                 towerDamage = towerDamage * (1 + 0.375f * WarmingUpStacks + 0.25f * HeatedUpStacks);
@@ -99,6 +84,20 @@ namespace Tryhardamere
             }
             return towerDamage;
         }
+
+        public static void ResetTowerStacks()
+        {
+            HeatStacks = 0;
+            HeatedUpStacks = 0;
+            WarmingUpStacks = 0;
+        }
+
+        public static void ResetTowerWarming()
+        {
+            WarmingUpStacks = 0;
+            HeatStacks = 0;
+        }
+
     }
 
 
