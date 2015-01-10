@@ -2,7 +2,6 @@
 using LeagueSharp;
 using LeagueSharp.Common;
 using System.Drawing;
-using Tryhardamere.SpellDetector.Skillshots;
 
 namespace Tryhardamere
 {
@@ -74,7 +73,6 @@ namespace Tryhardamere
 
                 Config.AddToMainMenu();
                 Trynda.GetSmiteSlot();
-                SkillshotDetector.SkillshotDetectorInit();
 
                 Drawing.OnDraw += OnDraw;
                 Game.OnGameUpdate += OnGameUpdate;
@@ -200,7 +198,6 @@ namespace Tryhardamere
             {
                 if (args.Target == null)
                 {
-                    Console.WriteLine(Skillshot.IsAboutToHit(150, ObjectManager.Player));
                     if (IncomingDamage.SkillshotHeroIsLethal(sender, args))
                     {
                         if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())

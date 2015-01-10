@@ -77,15 +77,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OutgoingDamage.cs" />
-    <Compile Include="SpellDetector\Helpers\Collision.cs" />
-    <Compile Include="SpellDetector\Helpers\Geometry.cs" />
-    <Compile Include="SpellDetector\Helpers\Utils.cs" />
-    <Compile Include="SpellDetector\Skillshots\Skillshot.cs" />
-    <Compile Include="SpellDetector\Skillshots\SkillshotDatabase.cs" />
-    <Compile Include="SpellDetector\Skillshots\SkillshotDetector.cs" />
-    <Compile Include="SpellDetector\Targeted\TargetSpell.cs" />
-    <Compile Include="SpellDetector\Targeted\TargetSpellDatabase.cs" />
-    <Compile Include="SpellDetector\Targeted\TargetSpellDetector.cs" />
     <Compile Include="Use.cs" />
     <Compile Include="IncomingDamage.cs" />
     <Compile Include="Program.cs" />

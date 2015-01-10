@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
-using Tryhardamere.SpellDetector.Skillshots;
 
 namespace Tryhardamere
 {
@@ -64,11 +62,11 @@ namespace Tryhardamere
             var attackerHero = (Obj_AI_Hero)sender;
             SpellSlot spellSlot = attackerHero.GetSpellSlot(args.SData.Name);
 
-            if (SkillshotDetector.IsAboutToHit(ObjectManager.Player, 150))
-            {
-                incDmg = attackerHero.GetSpellDamage(ObjectManager.Player, spellSlot);
+            //if (SkillshotDetector.IsAboutToHit(ObjectManager.Player, 150))
+            //{
+            //    incDmg = attackerHero.GetSpellDamage(ObjectManager.Player, spellSlot);
 
-            }
+            //}
             return ObjectManager.Player.Health <= incDmg;
         }
 
