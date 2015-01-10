@@ -49,9 +49,9 @@ namespace Tryhardamere.SpellDetector.Skillshots
 
         public static event OnSkillshotDelegate OnSkillshot;
 
-        static SkillshotDetector()
+        public static void SkillshotDetectorInit()
         {
-            return;
+
             if (!InitComplete)
             {
                 InitComplete = true;
@@ -60,6 +60,8 @@ namespace Tryhardamere.SpellDetector.Skillshots
                 //Detect when the skillshots are created.
                 Game.OnGameProcessPacket += GameOnOnGameProcessPacket; // Used only for viktor's Laser :^)
                 Obj_AI_Base.OnProcessSpellCast += HeroOnProcessSpellCast;
+                Game.OnGameUpdate += OnGameUpdate;
+
 
                 //Detect when projectiles collide.
                 GameObject.OnCreate += SpellMissileOnCreate;
@@ -365,7 +367,7 @@ namespace Tryhardamere.SpellDetector.Skillshots
                     {
                         return;
                     }
-
+                    Console.WriteLine("Skillshot added");
                     ActiveSkillshots.Add(skillshot);
                 }
             }
@@ -383,6 +385,7 @@ namespace Tryhardamere.SpellDetector.Skillshots
 
             if (OnDetectSkillshot != null)
             {
+                OnDetectSkillshotProcessing(skillshot);
                 OnDetectSkillshot(skillshot);
             }
         }

@@ -38,22 +38,22 @@ namespace Tryhardamere.SpellDetector.Helpers
          //<summary>
          //    Returns the position on the path after t milliseconds at speed speed.
          //</summary>
-        public static Vector2 PositionAfter(this List<Vector2> self, int t, int speed, int delay = 0)
-        {
-            var distance = Math.Max(0, t - delay) * speed / 1000;
-            for (var i = 0; i <= self.Count - 2; i++)
-            {
-                var from = self[i];
-                var to = self[i + 1];
-                var d = (int)to.Distance(from);
-                if (d > distance)
-                {
-                    return from + distance * (to - from).Normalized();
-                }
-                distance -= d;
-            }
-            return self[self.Count - 1];
-        }
+        //public static Vector2 PositionAfter(this List<Vector2> self, int t, int speed, int delay = 0)
+        //{
+        //    var distance = Math.Max(0, t - delay) * speed / 1000;
+        //    for (var i = 0; i <= self.Count - 2; i++)
+        //    {
+        //        var from = self[i];
+        //        var to = self[i + 1];
+        //        var d = (int)to.Distance(from);
+        //        if (d > distance)
+        //        {
+        //            return from + distance * (to - from).Normalized();
+        //        }
+        //        distance -= d;
+        //    }
+        //    return self[self.Count - 1];
+        //}
 
 
         public class Circle

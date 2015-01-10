@@ -54,7 +54,7 @@ namespace Tryhardamere
                 incDmg = attackerHero.GetAutoAttackDamage(ObjectManager.Player);
             else
                 incDmg = attackerHero.GetSpellDamage(ObjectManager.Player, spellSlot);
-            Console.WriteLine(args.SData.Name + " Tdamage: " + incDmg);
+
             return ObjectManager.Player.Health <= incDmg;
         }
 
@@ -67,7 +67,7 @@ namespace Tryhardamere
             if (SkillshotDetector.IsAboutToHit(ObjectManager.Player, 150))
             {
                 incDmg = attackerHero.GetSpellDamage(ObjectManager.Player, spellSlot);
-                Console.WriteLine(args.SData.Name + " Sdamage: " + incDmg);
+
             }
             return ObjectManager.Player.Health <= incDmg;
         }

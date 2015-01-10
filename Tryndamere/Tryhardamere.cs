@@ -74,6 +74,7 @@ namespace Tryhardamere
 
                 Config.AddToMainMenu();
                 Trynda.GetSmiteSlot();
+                SkillshotDetector.SkillshotDetectorInit();
 
                 Drawing.OnDraw += OnDraw;
                 Game.OnGameUpdate += OnGameUpdate;
@@ -199,7 +200,7 @@ namespace Tryhardamere
             {
                 if (args.Target == null)
                 {
-                    Console.WriteLine("Spell: " + args.SData.Name + "Target: " + args.Target);
+                    Console.WriteLine(Skillshot.IsAboutToHit(150, ObjectManager.Player));
                     if (IncomingDamage.SkillshotHeroIsLethal(sender, args))
                     {
                         if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())
@@ -215,7 +216,7 @@ namespace Tryhardamere
                 }
                 else if (args.Target.IsMe)
                 {
-                    Console.WriteLine("Spell: " + args.SData.Name);
+
                     if (IncomingDamage.TargetedHeroIsLethal(sender, args))
                     {
                         if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())

@@ -527,14 +527,14 @@ namespace Tryhardamere.SpellDetector.Skillshots
                                 (Environment.TickCount - StartTick);
 
 
-            var myPositionWhenExplodes = SkillshotGeometry.PositionAfter(path, timeToExplode, speed, delay);
+            var myPositionWhenExplodes = path.PositionAfter(timeToExplode, speed, delay);
 
             if (!IsSafe(myPositionWhenExplodes))
             {
                 return new SafePathResult(false, allIntersections[0]);
             }
 
-            var myPositionWhenExplodesWithOffset = SkillshotGeometry.PositionAfter(path, timeToExplode, speed, timeOffset);
+            var myPositionWhenExplodesWithOffset = path.PositionAfter(timeToExplode, speed, timeOffset);
 
             return new SafePathResult(IsSafe(myPositionWhenExplodesWithOffset), allIntersections[0]);
         }
