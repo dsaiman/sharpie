@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
-using SharpDX;
 
 
 namespace Tryhardamere
@@ -55,7 +50,7 @@ namespace Tryhardamere
                 {
                     Trynda.E.Cast(
                         Trynda.Player.Position.To2D()
-                            .Extend(target.Position.To2D(), target.Distance3D(Trynda.Player) + 200));
+                            .Extend(target.Position.To2D(), Math.Min(target.Distance3D(Trynda.Player) + 200f, Trynda.E.Range)));
                 }
             }
         }

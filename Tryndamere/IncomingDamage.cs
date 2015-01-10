@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
-using SharpDX;
+using Tryhardamere.SpellDetector.Skillshots;
 
 namespace Tryhardamere
 {
@@ -26,7 +23,7 @@ namespace Tryhardamere
             return ObjectManager.Player.Health <= GetTowerDamage(sender);
         }
 
-        public static bool HeroIsLethal(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        public static bool TargetedHeroIsLethal(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             double incDmg;
             var attackerHero = (Obj_AI_Hero) sender;
@@ -39,7 +36,7 @@ namespace Tryhardamere
                      spellSlot == SpellSlot.Item3 || spellSlot == SpellSlot.Item4 ||
                      spellSlot == SpellSlot.Item5 || spellSlot == SpellSlot.Item6)
             {
-                incDmg = 200;
+                incDmg = 200f;
                 if (args.SData.Name.Contains("Bilgewater"))
                     incDmg = attackerHero.GetItemDamage(ObjectManager.Player, Damage.DamageItems.Bilgewater);
                 if (args.SData.Name.Contains("Ruined"))
@@ -57,7 +54,21 @@ namespace Tryhardamere
                 incDmg = attackerHero.GetAutoAttackDamage(ObjectManager.Player);
             else
                 incDmg = attackerHero.GetSpellDamage(ObjectManager.Player, spellSlot);
-            Console.WriteLine("Damage from : " + args.SData.Name + " amount: " + incDmg);
+            Console.WriteLine(args.SData.Name + " Tdamage: " + incDmg);
+            return ObjectManager.Player.Health <= incDmg;
+        }
+
+        public static bool SkillshotHeroIsLethal(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            double incDmg = 0f;
+            var attackerHero = (Obj_AI_Hero)sender;
+            SpellSlot spellSlot = attackerHero.GetSpellSlot(args.SData.Name);
+
+            if (SkillshotDetector.IsAboutToHit(ObjectManager.Player, 150))
+            {
+                incDmg = attackerHero.GetSpellDamage(ObjectManager.Player, spellSlot);
+                Console.WriteLine(args.SData.Name + " Sdamage: " + incDmg);
+            }
             return ObjectManager.Player.Health <= incDmg;
         }
 

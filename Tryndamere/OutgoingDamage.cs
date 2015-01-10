@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
-using System.Drawing;
-using SharpDX;
 
 
 namespace Tryhardamere
@@ -27,15 +21,15 @@ namespace Tryhardamere
         public static float TimeToReach(Obj_AI_Hero target)
         {
             var dist = Trynda.Player.Distance(target);
-            Vector2 movePos = new Vector2();
+            float msDif;
+            var movePos = target.Position.To2D();
             if (target.IsMoving)
             {
-                Vector2 tpos = target.Position.To2D();
-                Vector2 path = target.Path[0].To2D() - tpos;
+                var path = Prediction.GetPrediction(target, 0.5f).UnitPosition.To2D();
                 path.Normalize();
-                movePos = tpos + (path * 100);
+                movePos += (path * 100f);
             }
-
+            
             float targMs;
             if (target.IsMoving && Trynda.Player.Distance(movePos) > dist)
             {
@@ -46,8 +40,7 @@ namespace Tryhardamere
                 targMs = 0f;
             }
 
-            float msDif;
-            if (Math.Abs((Trynda.Player.MoveSpeed - targMs)) < 0.01f)
+            if (Math.Abs((Trynda.Player.MoveSpeed - targMs)) < 0.1f)
             {
                 msDif = 0f;
             }
@@ -56,12 +49,13 @@ namespace Tryhardamere
                 msDif = Trynda.Player.MoveSpeed - targMs;
             }
 
+
             return dist / msDif;
         }
 
         public static bool IsReachable(Obj_AI_Hero target)
         {
-            return !(TimeToReach(target) < 0);
+            return !(TimeToReach(target) < 0f);
         }
 
         public static float TimeToKill(Obj_AI_Hero target)

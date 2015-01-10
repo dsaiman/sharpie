@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using System.Drawing;
+using Tryhardamere.SpellDetector.Skillshots;
 
 namespace Tryhardamere
 {
@@ -77,6 +74,7 @@ namespace Tryhardamere
 
                 Config.AddToMainMenu();
                 Trynda.GetSmiteSlot();
+
                 Drawing.OnDraw += OnDraw;
                 Game.OnGameUpdate += OnGameUpdate;
 
@@ -199,9 +197,26 @@ namespace Tryhardamere
 
             if (sender.IsEnemy && sender.Type == GameObjectType.obj_AI_Hero)
             {
-                if (args.Target.IsMe)
+                if (args.Target == null)
                 {
-                    if (IncomingDamage.HeroIsLethal(sender, args))
+                    Console.WriteLine("Spell: " + args.SData.Name + "Target: " + args.Target);
+                    if (IncomingDamage.SkillshotHeroIsLethal(sender, args))
+                    {
+                        if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())
+                        {
+                            Trynda.R.Cast();
+                        }
+                        if (Config.Item("autoQ").GetValue<bool>() && Trynda.Q.IsReady() &&
+                            !Trynda.Player.HasBuff("Undying Rage") && !Trynda.R.IsReady())
+                        {
+                            Trynda.Q.Cast();
+                        }
+                    }
+                }
+                else if (args.Target.IsMe)
+                {
+                    Console.WriteLine("Spell: " + args.SData.Name);
+                    if (IncomingDamage.TargetedHeroIsLethal(sender, args))
                     {
                         if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())
                         {
@@ -232,7 +247,7 @@ namespace Tryhardamere
                         (Trynda.Orbwalker.ActiveMode.ToString() == "Mixed" ||
                          Trynda.Orbwalker.ActiveMode.ToString() == "LaneClear"))
                     {
-                        Trynda.E.Cast(Trynda.Player.Position.To2D().Extend(sender.Position.To2D(), -900f));
+                        Trynda.E.Cast(Trynda.Player.Position.To2D().Extend(sender.Position.To2D(), -Trynda.E.Range));
                     }
 
                     //            if (!IncomingDamage.StackResetDelay)
