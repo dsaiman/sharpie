@@ -21,7 +21,7 @@ namespace Tryhardamere
         public static float TimeToReach(Obj_AI_Hero target)
         {
             var dist = Trynda.Player.Distance(target);
-            float msDif;
+            float msDif, time;
             var movePos = target.Position.To2D();
             if (target.IsMoving)
             {
@@ -42,15 +42,16 @@ namespace Tryhardamere
 
             if (Math.Abs((Trynda.Player.MoveSpeed - targMs)) < 0.1f)
             {
-                msDif = 0f;
+                time = -1f;
             }
             else
             {
                 msDif = Trynda.Player.MoveSpeed - targMs;
+                time = dist / msDif;
             }
 
 
-            return dist / msDif;
+            return time;
         }
 
         public static bool IsReachable(Obj_AI_Hero target)
