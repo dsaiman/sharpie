@@ -58,7 +58,7 @@ namespace Tryhardamere
 
         public static bool SkillshotHeroIsLethal(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            double incDmg = 0f;
+            double incDmg = 200f;
             var attackerHero = (Obj_AI_Hero)sender;
             SpellSlot spellSlot = attackerHero.GetSpellSlot(args.SData.Name);
 

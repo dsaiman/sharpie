@@ -9,12 +9,12 @@ namespace Tryhardamere
     {
         public static int AutosToLethal(Obj_AI_Hero target)
         {
-            return (int) Math.Round(target.Health / Trynda.Player.GetAutoAttackDamage(target));
+            return (int) Math.Round(target.Health / ObjectManager.Player.GetAutoAttackDamage(target));
         }
 
         public static float TimeToMeleeKill(Obj_AI_Hero target)
         {
-            var aspd = Trynda.Player.AttackSpeedMod * 0.67f;
+            var aspd = ObjectManager.Player.AttackSpeedMod * 0.67f;
             return (float) Math.Round(AutosToLethal(target) / aspd);
         }
 
