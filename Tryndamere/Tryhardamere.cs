@@ -80,6 +80,8 @@ namespace Tryhardamere
                 Obj_AI_Base.OnProcessSpellCast += MinionSpellCast;
                 Obj_AI_Base.OnProcessSpellCast += HeroSpellCast;
                 Obj_AI_Base.OnProcessSpellCast += TowerSpellCast;
+                Obj_AI_Base.OnProcessSpellCast += IncomingDamage.ChargeOnTowerSpellCast;
+
             }
             catch
             {
@@ -255,33 +257,7 @@ namespace Tryhardamere
                         Trynda.E.Cast(Trynda.Player.Position.To2D().Extend(sender.Position.To2D(), -Trynda.E.Range));
                     }
 
-                    //            if (!IncomingDamage.StackResetDelay)
-                    //            {
-                    //                Utility.DelayAction.ActionList.Clear();
-                    //                Utility.DelayAction.Add(1500, () => IncomingDamage.StackResetDelay = true);
-                    //            }
 
-                    if (IncomingDamage.TowerIsOuter(sender))
-                    {
-                        if (IncomingDamage.WarmingUpStacks < 2)
-                        {
-                            IncomingDamage.WarmingUpStacks++;
-                            //Console.WriteLine("Warming: " + IncomingDamage.WarmingUpStacks);
-                        }
-                        else if (IncomingDamage.HeatedUpStacks < 2)
-                        {
-                            IncomingDamage.HeatedUpStacks++;
-                            //Console.WriteLine("Heated: " + IncomingDamage.HeatedUpStacks);
-                        }
-                    }
-                    if (IncomingDamage.TowerIsInhib(sender))
-                    {
-                        if (IncomingDamage.HeatStacks < 120)
-                        {
-                            IncomingDamage.HeatStacks = IncomingDamage.HeatStacks + 6;
-                            //Console.WriteLine("Heat: " + IncomingDamage.HeatStacks);
-                        }
-                    }
                     if (IncomingDamage.TowerIsLethal(sender, args))
                     {
                         if (Config.Item("autoR").GetValue<bool>() && Trynda.R.IsReady())
@@ -295,21 +271,6 @@ namespace Tryhardamere
                         }
                     }
                 }
-                else if (args.Target.IsAlly && args.Target.Type == GameObjectType.obj_AI_Hero)
-                {
-                    IncomingDamage.ResetTowerWarming();
-                }
-                else
-                {
-                    IncomingDamage.ResetTowerStacks();
-                }
-                //        else if (IncomingDamage.StackResetDelay)
-                //        {
-                //            IncomingDamage.ResetTowerStacks(); 
-                //            IncomingDamage.StackResetDelay = false
-                //        }
-                //    }
-                //}
 
             }
         }

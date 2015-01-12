@@ -107,6 +107,67 @@ namespace Tryhardamere
             HeatStacks = 0;
         }
 
+        public static void ChargeOnTowerSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (ObjectManager.Player.IsDead || ObjectManager.Player.InFountain())
+            {
+                return;
+            }
+
+            if (sender.IsEnemy && sender.Type == GameObjectType.obj_AI_Turret &&
+                sender.Distance(ObjectManager.Player) < 2000f)
+            {
+
+                if (args.Target.IsMe)
+                {
+                    if (TowerIsOuter(sender))
+                    {
+                        if (WarmingUpStacks < 2)
+                        {
+                            WarmingUpStacks++;
+                            //Console.WriteLine("Warming: " + WarmingUpStacks);
+                        }
+                        else if (HeatedUpStacks < 2)
+                        {
+                            HeatedUpStacks++;
+                            //Console.WriteLine("Heated: " + HeatedUpStacks);
+                        }
+                    }
+                    if (TowerIsInhib(sender))
+                    {
+                        if (HeatStacks < 120)
+                        {
+                            HeatStacks = HeatStacks + 6;
+                            //Console.WriteLine("Heat: " + HeatStacks);
+                        }
+                    }
+
+                }
+                else if (args.Target.IsAlly && args.Target.Type == GameObjectType.obj_AI_Hero)
+                {
+                    ResetTowerWarming();
+                }
+                else
+                {
+                    ResetTowerStacks();
+                }
+
+            }
+            //            if (!IncomingDamage.StackResetDelay)
+            //            {
+            //                Utility.DelayAction.ActionList.Clear();
+            //                Utility.DelayAction.Add(1500, () => IncomingDamage.StackResetDelay = true);
+            //            }
+
+            //        else if (IncomingDamage.StackResetDelay)
+            //        {
+            //            IncomingDamage.ResetTowerStacks(); 
+            //            IncomingDamage.StackResetDelay = false
+            //        }
+            //    }
+            //}
+
+        }
     }
 
 
