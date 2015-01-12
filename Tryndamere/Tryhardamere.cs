@@ -154,12 +154,19 @@ namespace Tryhardamere
                 Target = TargetSelector.GetTarget(1050f, TargetSelector.DamageType.Physical);
                 if (Target != null && Target.IsValid)
                 {
-                    var wts = Drawing.WorldToScreen(Target.Position);
+                    var targetpos = Drawing.WorldToScreen(Target.Position);
                     Drawing.DrawText(
-                        wts[0] - 40, wts[1] + 40, Color.White, "Autos To Kill: " + OutgoingDamage.AutosToLethal(Target));
+                        targetpos[0] - 40, targetpos[1] + 40, Color.White, "Autos To Kill: " + OutgoingDamage.AutosToLethal(Target));
+
                 }
             }
-        }
+            if (Target != null && Target.IsValid)
+            {
+                //Drawing.DrawLine(
+                //    Trynda.Player.Position.To2D(), Prediction.GetPrediction(Target, 0.5f).UnitPosition.To2D(), 2f,
+                //    Color.Chartreuse);
+            }
+    }
 
         private static void MinionSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {

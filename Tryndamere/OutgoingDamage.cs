@@ -20,52 +20,42 @@ namespace Tryhardamere
 
         public static float TimeToReach(Obj_AI_Hero target)
         {
-            var dist = Trynda.Player.Distance(target);
-            float msDif, time;
-            var movePos = target.Position.To2D();
-            if (target.IsMoving)
+            float moveSpeedDiff;
+
+            if (Math.Abs(ObjectManager.Player.MoveSpeed - target.MoveSpeed) < 0.1f)
             {
-                var path = Prediction.GetPrediction(target, 0.5f).UnitPosition.To2D();
-                path.Normalize();
-                movePos += (path * 100f);
+                moveSpeedDiff = 0f;
             }
             
-            float targMs;
-            if (target.IsMoving && Trynda.Player.Distance(movePos) > dist)
-            {
-                targMs = target.MoveSpeed;
-            }
             else
             {
-                targMs = 0f;
+                moveSpeedDiff = ObjectManager.Player.MoveSpeed - target.MoveSpeed;
             }
 
-            if (Math.Abs((Trynda.Player.MoveSpeed - targMs)) < 0.1f)
+            if (moveSpeedDiff <= 0f)
             {
-                time = -1f;
+                return ObjectManager.Player.Distance(target) / ObjectManager.Player.MoveSpeed;
             }
-            else
-            {
-                msDif = Trynda.Player.MoveSpeed - targMs;
-                time = dist / msDif;
-            }
-
-
-            return time;
+            
+            return ObjectManager.Player.Distance(target) / moveSpeedDiff;
         }
 
-        public static bool IsReachable(Obj_AI_Hero target)
+        public static bool IsMovingToMe(Obj_AI_Hero target)
         {
-            return !(TimeToReach(target) < 0f);
+            if (target.IsMoving && target.Path[0].IsValid())
+            {
+                var targetPos = target.Position.To2D();
+                var targetPath = target.Path[0].To2D();
+                targetPath.Normalize();
+                targetPath = targetPath * 100f;
+                targetPath += targetPos;
+                if (ObjectManager.Player.Distance(target) > ObjectManager.Player.Distance(targetPath))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
-        public static float TimeToKill(Obj_AI_Hero target)
-        {
-            if (IsReachable(target))
-            {
-                return TimeToReach(target) + TimeToMeleeKill(target);
-            }
-            return Math.Abs(TimeToReach(target) + TimeToMeleeKill(target));
-        }
     }
 }
