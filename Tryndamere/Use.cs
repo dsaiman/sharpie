@@ -46,7 +46,7 @@ namespace Tryhardamere
             var trueERange = target.BoundingRadius + Trynda.E.Range;
             if (Trynda.Player.Distance(target) > trueAARange && Trynda.Player.Distance(target) < trueERange)
             {
-                if ((OutgoingDamage.TimeToReach(target) > 1f && !OutgoingDamage.IsMovingToMe(target)) || Trynda.E.GetDamage(target) < target.Health)
+                if ((OutgoingDamage.TimeToReach(target) > 1f && !OutgoingDamage.IsMovingToMe(target)) || Trynda.E.GetDamage(target) >= target.Health)
                 {
                     Trynda.E.Cast(
                         ObjectManager.Player.Position.To2D()
