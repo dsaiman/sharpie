@@ -157,16 +157,18 @@ namespace Tryhardamere
                 if (Target != null && Target.IsValid)
                 {
                     var targetpos = Drawing.WorldToScreen(Target.Position);
+                    
+                    var targetPos = Target.Position.To2D();
+                    var targetPath = Target.Path[0].To2D();
+                    targetPath = Drawing.WorldToScreen(targetPath.To3D());
+                    targetPos = Drawing.WorldToScreen(targetPos.To3D());
+                    Drawing.DrawLine(targetPos, targetPath, 10, Color.Red);
+
+
                     Drawing.DrawText(
                         targetpos[0] - 40, targetpos[1] + 40, Color.White, "Autos To Kill: " + OutgoingDamage.AutosToLethal(Target));
 
                 }
-            }
-            if (Target != null && Target.IsValid)
-            {
-                //Drawing.DrawLine(
-                //    Trynda.Player.Position.To2D(), Prediction.GetPrediction(Target, 0.5f).UnitPosition.To2D(), 2f,
-                //    Color.Chartreuse);
             }
     }
 

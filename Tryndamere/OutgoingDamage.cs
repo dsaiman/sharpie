@@ -34,9 +34,9 @@ namespace Tryhardamere
 
             if (moveSpeedDiff <= 0f)
             {
-                return ObjectManager.Player.Distance(target) / ObjectManager.Player.MoveSpeed;
+                return -1f;
             }
-            
+
             return ObjectManager.Player.Distance(target) / moveSpeedDiff;
         }
 
@@ -44,11 +44,7 @@ namespace Tryhardamere
         {
             if (target.IsMoving && target.Path[0].IsValid())
             {
-                var targetPos = target.Position.To2D();
                 var targetPath = target.Path[0].To2D();
-                targetPath.Normalize();
-                targetPath = targetPath * 100f;
-                targetPath += targetPos;
                 if (ObjectManager.Player.Distance(target) > ObjectManager.Player.Distance(targetPath))
                 {
                     return true;
