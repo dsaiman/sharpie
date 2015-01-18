@@ -28,11 +28,9 @@ namespace Tryhardamere
             var trueAARange = Trynda.Player.AttackRange + target.BoundingRadius;
             if (Trynda.Player.Distance(target) > trueAARange && Trynda.Player.Distance(target) < Trynda.W.Range)
             {
-                if (OutgoingDamage.TimeToReach(target) > 1.7f 
+                if (OutgoingDamage.TimeToReach(target) < 0 
                     &&!target.IsFacing(Trynda.Player) 
-                    && !OutgoingDamage.IsMovingToMe(target) 
-                    && OutgoingDamage.TimeToReach(target) < 0)
-                {
+                    && !OutgoingDamage.IsMovingToMe(target))                {
                     Trynda.W.Cast();
                 }
             }
@@ -48,9 +46,9 @@ namespace Tryhardamere
             var trueERange = target.BoundingRadius + Trynda.E.Range;
             if (Trynda.Player.Distance(target) > trueAARange && Trynda.Player.Distance(target) < trueERange)
             {
-                if ((OutgoingDamage.TimeToReach(target) > 1.7f && !OutgoingDamage.IsMovingToMe(target)) 
-                    || Trynda.E.GetDamage(target) >= target.Health 
-                    || OutgoingDamage.TimeToReach(target) < 0)
+                if ((OutgoingDamage.TimeToReach(target) < 0 && !OutgoingDamage.IsMovingToMe(target)) 
+                    || Trynda.E.GetDamage(target) >= target.Health &&
+                    !Trynda.W.IsReady()) 
                 {
                     Trynda.E.Cast(
                         ObjectManager.Player.Position.To2D()

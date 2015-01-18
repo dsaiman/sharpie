@@ -45,10 +45,14 @@ namespace Tryhardamere
             if (target.IsMoving && target.Path[0].IsValid())
             {
                 var targetPath = target.Path[0].To2D();
-                if (ObjectManager.Player.Distance(target) > ObjectManager.Player.Distance(targetPath))
+                if (ObjectManager.Player.Distance(target) >= ObjectManager.Player.Distance(targetPath))
                 {
                     return true;
                 }
+            }
+            else if (!target.IsMoving)
+            {
+                return true;
             }
             return false;
         }
