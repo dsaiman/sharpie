@@ -28,9 +28,10 @@ namespace Kayle
 
         public static void UseWSustain(Obj_AI_Hero target)
         {
-            if ((ObjectManager.Player.MaxHealth - ObjectManager.Player.Health < K.W.GetDamage(target) &&
-                 (ObjectManager.Player.CountEnemysInRange(2000f) < 1) ||
-                ObjectManager.Player.HealthPercentage() < 40) && ObjectManager.Player.ManaPercentage() > 50 )
+            if (ObjectManager.Player.MaxHealth - ObjectManager.Player.Health < K.W.GetDamage(target) &&
+                (ObjectManager.Player.CountEnemysInRange(2000f) < 1 ||
+                ObjectManager.Player.HealthPercentage() < 50) && 
+                ObjectManager.Player.ManaPercentage() > 50 )
             {
                 K.W.Cast(target);
             }
@@ -53,8 +54,9 @@ namespace Kayle
         public static void UseQCombo(Obj_AI_Hero target)
         {
             if (OutgoingDamage.IsEscaping(target) ||
-                (OutgoingDamage.SheenProcable() && target.Distance(ObjectManager.Player) <= K.E.Range) || 
-                K.Q.GetDamage(target) <= target.Health && ObjectManager.Player.Mana > 90f)
+               (OutgoingDamage.SheenProcable() && target.Distance(ObjectManager.Player) <= K.E.Range) && 
+                (K.Q.GetDamage(target) <= target.Health || 
+                ObjectManager.Player.Mana > 90f))
             {
                 K.Q.Cast(target);
             }

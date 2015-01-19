@@ -92,19 +92,19 @@ namespace Kayle
         {
             if (KMenu.Config.Item("drawQ").GetValue<bool>())
             {
-                Drawing.DrawCircle(K.Player.Position, K.Q.Range, Color.Firebrick);
+                Render.Circle.DrawCircle(K.Player.Position, K.Q.Range, Color.Firebrick);
             }
             if (KMenu.Config.Item("drawW").GetValue<bool>())
             {
-                Drawing.DrawCircle(K.Player.Position, K.W.Range, Color.DeepSkyBlue);
+                Render.Circle.DrawCircle(K.Player.Position, K.W.Range, Color.DeepSkyBlue);
             }
             if (KMenu.Config.Item("drawE").GetValue<bool>())
             {
-                Drawing.DrawCircle(K.Player.Position, K.E.Range, Color.DeepPink);
+                Render.Circle.DrawCircle(K.Player.Position, K.E.Range, Color.DeepPink);
             }
             if (KMenu.Config.Item("drawR").GetValue<bool>())
             {
-                Drawing.DrawCircle(K.Player.Position, K.R.Range, Color.GreenYellow);
+                Render.Circle.DrawCircle(K.Player.Position, K.R.Range, Color.GreenYellow);
             }
 
 
