@@ -177,7 +177,7 @@ namespace TwistedFate
         {
             if (Config.Item("drawR").GetValue<bool>())
             {
-                Utility.DrawCircle(ObjectManager.Player.Position, TF.R.Range, Color.White, 1, 23, true);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, TF.R.Range, Color.White);
             }
         }
     }

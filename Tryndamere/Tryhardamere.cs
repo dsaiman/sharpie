@@ -145,11 +145,11 @@ namespace Tryhardamere
         {
             if (Config.Item("drawE").GetValue<bool>())
             {
-                Drawing.DrawCircle(Trynda.Player.Position, Trynda.E.Range, Color.RoyalBlue);
+                Render.Circle.DrawCircle(Trynda.Player.Position, Trynda.E.Range, Color.Fuchsia);
             }
             if (Config.Item("drawW").GetValue<bool>())
             {
-                Drawing.DrawCircle(Trynda.Player.Position, 820f, Color.Firebrick);
+                Render.Circle.DrawCircle(Trynda.Player.Position, 820f, Color.LightSeaGreen);
             }
 
             if (Config.Item("drawAAtoKill").GetValue<bool>())

@@ -86,7 +86,7 @@ namespace TwistedFate
         {
             if (CardSelector.Status == SelectStatus.Ready)
             {
-                if (Utility.CountEnemysInRange(TF.Q.Range) > 2)
+                if (ObjectManager.Player.CountEnemiesInRange(TF.Q.Range) > 2)
                 {
                     CardSelector.StartSelecting(Cards.Red);
                 }
