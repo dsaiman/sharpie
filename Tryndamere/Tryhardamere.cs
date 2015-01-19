@@ -159,10 +159,6 @@ namespace Tryhardamere
                     var targetpos = Drawing.WorldToScreen(Target.Position);
 
                     Drawing.DrawText(
-    targetpos[0] - 80, targetpos[1] + 80, Color.White, " " + OutgoingDamage.TimeToReach(Target));
-
-
-                    Drawing.DrawText(
                         targetpos[0] - 40, targetpos[1] + 40, Color.White, "Autos To Kill: " + OutgoingDamage.AutosToLethal(Target));
 
                 }
