@@ -49,6 +49,8 @@ namespace Trundle
             Config.AddSubMenu(new Menu("Utilities", "utils"));
             Config.SubMenu("utils").AddItem(new MenuItem("useRTanks", "Force R on tanks in Teamfight")).SetValue(false);
             Config.SubMenu("utils").AddItem(new MenuItem("EGap", "Use E on gapcloser")).SetValue(true);
+            Config.SubMenu("utils").AddItem(new MenuItem("EInterrupt", "Use E to interrupt important spells")).SetValue(true);
+
 
 
             //Drawings

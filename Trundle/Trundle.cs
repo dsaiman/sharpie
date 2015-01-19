@@ -29,6 +29,7 @@ namespace Trundle
                 Drawing.OnDraw += OnDraw;
                 Game.OnGameUpdate += OnGameUpdate;
                 Orbwalking.AfterAttack += AfterAttack;
+                Interrupter.OnPossibleToInterrupt += OnPossibleInterrupt;
 
                 AntiGapcloser.OnEnemyGapcloser += OnGapCloser;
             }
@@ -105,12 +106,32 @@ namespace Trundle
             }
         }
 
+        private static void OnPossibleInterrupt(Obj_AI_Base sender, InterruptableSpell spell)
+        {
+            if (spell.DangerLevel < InterruptableDangerLevel.High || sender.IsAlly)
+            {
+                return;
+            }
+            if (TMenu.Config.Item("EInterrupt").GetValue<bool>() && T.E.IsReady() && sender.Distance(ObjectManager.Player) < T.E.Range)
+            {
+                T.E.Cast(
+                    ObjectManager.Player.Position.Extend(sender.Position, sender.Distance(ObjectManager.Player) + 50f));
+            }
+        }
+
         private static void OnGapCloser(ActiveGapcloser gapcloser)
         {
             if (TMenu.Config.Item("EGap").GetValue<bool>() && gapcloser.Sender.IsValidTarget() &&
                 ObjectManager.Player.Distance(gapcloser.Sender.Position) <= T.E.Range)
             {
-                T.E.Cast(ObjectManager.Player.Position.Extend(gapcloser.Sender.Position, 10f));
+                if (gapcloser.End.Distance(ObjectManager.Player.Position) > gapcloser.Start.Distance(ObjectManager.Player.Position))
+                {
+                    T.E.Cast(gapcloser.End);
+                }
+                else
+                {
+                    T.E.Cast(ObjectManager.Player.Position.Extend(gapcloser.End, 50f));
+                }
             }
         }
 
