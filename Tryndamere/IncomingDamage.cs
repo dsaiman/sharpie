@@ -12,7 +12,7 @@ namespace Tryhardamere
         public static bool MinionIsLethal(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             //Console.WriteLine("Damage from Minion: " + sender.GetAutoAttackDamage(ObjectManager.Player));
-            return ObjectManager.Player.Health <= sender.GetAutoAttackDamage(ObjectManager.Player);
+            return ObjectManager.Player.Health <= sender.CalcDamage(ObjectManager.Player, Damage.DamageType.Physical, sender.BaseAttackDamage);
         }
 
         public static bool TowerIsLethal(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
