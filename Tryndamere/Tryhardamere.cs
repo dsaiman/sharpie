@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 using System.Drawing;
@@ -157,7 +158,7 @@ namespace Tryhardamere
                 if (Target != null && Target.IsValid)
                 {
                     var targetpos = Drawing.WorldToScreen(Target.Position);
-
+                    
                     Drawing.DrawText(
                         targetpos[0] - 40, targetpos[1] + 40, Color.White, "Autos To Kill: " + OutgoingDamage.AutosToLethal(Target));
 

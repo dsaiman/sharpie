@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 
@@ -42,10 +44,10 @@ namespace Tryhardamere
 
         public static bool IsMovingToMe(Obj_AI_Hero target)
         {
-            if (target.IsMoving && target.Path[0].IsValid())
+            if (target.Path.Count() > 0)
             {
                 var targetPath = target.Path[0].To2D();
-                if (ObjectManager.Player.Distance(target) >= ObjectManager.Player.Distance(targetPath))
+                if (ObjectManager.Player.Distance(target) > ObjectManager.Player.Distance(targetPath))
                 {
                     return true;
                 }
