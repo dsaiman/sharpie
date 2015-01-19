@@ -69,7 +69,7 @@ namespace Tryhardamere
             }
 
             if ((Trynda.MyHpPerc() <= Tryhardamere.Config.Item("RonHp").GetValue<Slider>().Value) &&
-                (Utility.CountEnemysInRange(900) > 0))
+                (ObjectManager.Player.CountEnemiesInRange(900) > 0))
             {
                 Trynda.R.Cast();
             }
