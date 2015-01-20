@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LeagueSharp;
 using LeagueSharp.Common;
 
 namespace Trundle
@@ -48,10 +50,24 @@ namespace Trundle
             //Utilities
             Config.AddSubMenu(new Menu("Utilities", "utils"));
             Config.SubMenu("utils").AddItem(new MenuItem("useRTanks", "Force R on tanks in Teamfight")).SetValue(false);
-            Config.SubMenu("utils").AddItem(new MenuItem("EGap", "Use E on gapcloser")).SetValue(true);
-            Config.SubMenu("utils").AddItem(new MenuItem("EInterrupt", "Use E to interrupt important spells")).SetValue(true);
-
-
+            Config.SubMenu("utils").AddSubMenu(new Menu("Anti Gapcloser", "GC"));
+            foreach (var gc in from gc in AntiGapcloser.Spells
+                from enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy)
+                where gc.ChampionName == enemy.ChampionName
+                select gc)
+            {
+                Config.SubMenu("utils").SubMenu("GC").AddItem(new MenuItem("Gap" + gc.Slot, gc.ChampionName + " " + gc.Slot.ToString())).SetValue(true);
+            }
+            Config.SubMenu("utils").SubMenu("GC").AddItem(new MenuItem("EGap", "Use E on gapcloser")).SetValue(true);
+            Config.SubMenu("utils").AddSubMenu(new Menu("Interrupter", "Inte"));
+            foreach (var interr in from interr in Interrupter.Spells
+                from enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy)
+                where interr.ChampionName == enemy.ChampionName
+                select interr)
+            {
+                Config.SubMenu("utils").SubMenu("Inte").AddItem(new MenuItem("Interr" + interr.Slot, interr.ChampionName + " " + interr.Slot.ToString())).SetValue(true);
+            }
+            Config.SubMenu("utils").SubMenu("Inte").AddItem(new MenuItem("EInterrupt", "Use E to interrupt important spells")).SetValue(true);
 
             //Drawings
             Config.AddSubMenu(new Menu("Drawings", "drawings"));

@@ -34,6 +34,12 @@ namespace Trundle
         public static Spell R = new Spell(SpellSlot.R, 700f);
         public static Spell Smite;
 
+        public static void SetSkillShots()
+        {
+            W.SetSkillshot(.5f, 750f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            E.SetSkillshot(.5f, 188f, 1600f, false, SkillshotType.SkillshotCircle);
+        }
+
         public static void Combo(Obj_AI_Hero target)
         {
             if (TMenu.Config.Item("useIgniteCombo").GetValue<bool>())

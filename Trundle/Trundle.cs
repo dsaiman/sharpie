@@ -24,6 +24,7 @@ namespace Trundle
                 Game.PrintChat("<font color=\"#00BFFF\">Trundle# -</font> Loaded!");
                 TMenu.AddMenu();
 
+                T.SetSkillShots();
                 T.GetSmiteSlot();
 
                 Drawing.OnDraw += OnDraw;
@@ -108,29 +109,33 @@ namespace Trundle
 
         private static void OnPossibleInterrupt(Obj_AI_Base sender, InterruptableSpell spell)
         {
-            if (spell.DangerLevel < InterruptableDangerLevel.High || sender.IsAlly)
+            if (sender.IsAlly ||
+                !TMenu.Config.Item("EInterrupt").GetValue<bool>() ||
+                !TMenu.Config.Item("Interr" + spell.Slot).GetValue<bool>())
             {
                 return;
             }
-            if (TMenu.Config.Item("EInterrupt").GetValue<bool>() && T.E.IsReady() && sender.Distance(ObjectManager.Player) < T.E.Range)
+            if (T.E.IsReady() && sender.Distance(ObjectManager.Player) < T.E.Range)
             {
                 T.E.Cast(
-                    ObjectManager.Player.Position.Extend(sender.Position, sender.Distance(ObjectManager.Player) + 50f));
+                    ObjectManager.Player.Position.Extend(sender.Position, sender.Distance(ObjectManager.Player) + T.E.Width));
             }
         }
 
         private static void OnGapCloser(ActiveGapcloser gapcloser)
         {
-            if (TMenu.Config.Item("EGap").GetValue<bool>() && gapcloser.Sender.IsValidTarget() &&
+            if (TMenu.Config.Item("EGap").GetValue<bool>() && 
+                TMenu.Config.Item("Gap" + gapcloser.Slot).GetValue<bool>() &&
+                gapcloser.Sender.IsValidTarget() &&
                 ObjectManager.Player.Distance(gapcloser.Sender.Position) <= T.E.Range)
             {
                 if (gapcloser.End.Distance(ObjectManager.Player.Position) > gapcloser.Start.Distance(ObjectManager.Player.Position))
                 {
-                    T.E.Cast(gapcloser.End);
+                    T.E.Cast(gapcloser.Start.Extend(gapcloser.End, T.E.Width + gapcloser.Sender.BoundingRadius));
                 }
                 else
                 {
-                    T.E.Cast(ObjectManager.Player.Position.Extend(gapcloser.End, 50f));
+                    T.E.Cast(ObjectManager.Player.Position.Extend(gapcloser.End, T.E.Width/2));
                 }
             }
         }
