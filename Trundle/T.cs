@@ -28,7 +28,7 @@ namespace Trundle
         public static SpellDataInst Wdata = SBook.GetSpell(SpellSlot.W);
         public static SpellDataInst Edata = SBook.GetSpell(SpellSlot.E);
         public static SpellDataInst Rdata = SBook.GetSpell(SpellSlot.R);
-        public static Spell Q = new Spell(SpellSlot.Q, 180f);
+        public static Spell Q = new Spell(SpellSlot.Q, 125f);
         public static Spell W = new Spell(SpellSlot.W, 900f);
         public static Spell E = new Spell(SpellSlot.E, 1000f);
         public static Spell R = new Spell(SpellSlot.R, 700f);
@@ -61,13 +61,12 @@ namespace Trundle
             {
                 Use.UseWCombo(target);
             }
-            
-            if (!OutgoingDamage.IsMovingToMe(target) && 
+            if (!OutgoingDamage.IsMovingToMe(target) &&
                 target.Distance(ObjectManager.Player) > Orbwalking.GetRealAutoAttackRange(target))
             {
                 Use.UseECombo(target);
             }
-            
+
             if (ObjectManager.Player.HealthPercentage() < 60 || target.Health < R.GetDamage(target) &&
                 !TMenu.Config.Item("useRTanks").GetValue<bool>())
             {

@@ -48,28 +48,27 @@ namespace Trundle
             {
                 return;
             }
+            switch (T.Orbwalker.ActiveMode)
+            {
+                    case Orbwalking.OrbwalkingMode.Combo:
+                        Target = TargetSelector.GetTarget(T.E.Range, TargetSelector.DamageType.Physical);
+                        if (Target.IsValidTarget())
+                        {
+                            T.Combo(Target);
+                        }
+                    break;
 
-            if (T.Orbwalker.ActiveMode.ToString() == "Combo")
-            {
-                Target = TargetSelector.GetTarget(T.E.Range, TargetSelector.DamageType.Physical);
-                if (Target.IsValidTarget())
-                {
-                    T.Combo(Target);
-                }
-            }
-            
-            if (T.Orbwalker.ActiveMode.ToString() == "Mixed")
-            {
-                Target = TargetSelector.GetTarget(420f, TargetSelector.DamageType.Physical);
-                if (Target.IsValidTarget())
-                {
-                    T.Mixed(Target);
-                }
-            } 
-            
-            if (T.Orbwalker.ActiveMode.ToString() == "LaneClear")
-            {
-                T.LaneClear();
+                    case Orbwalking.OrbwalkingMode.Mixed:
+                        Target = TargetSelector.GetTarget(420f, TargetSelector.DamageType.Physical);
+                        if (Target.IsValidTarget())
+                        {
+                            T.Mixed(Target);
+                        }
+                    break;
+
+                    case Orbwalking.OrbwalkingMode.LaneClear:
+                        T.LaneClear();
+                    break;
             }
 
         }
@@ -78,65 +77,69 @@ namespace Trundle
         {
             if (sender.IsMe)
             {
-                switch (T.Orbwalker.ActiveMode.ToString())
+                switch (T.Orbwalker.ActiveMode)
                 {
-                    case "Combo":
+                    case Orbwalking.OrbwalkingMode.Combo:
                         if (T.Q.IsReady() && ObjectManager.Player.Distance(target) <= Orbwalking.GetRealAutoAttackRange(target))
                         {
                             T.Q.Cast();
                             Orbwalking.ResetAutoAttackTimer();
                         }
                         break;
-                    case "Mixed":
+                    case Orbwalking.OrbwalkingMode.Mixed:
                         if (T.Q.IsReady() && ObjectManager.Player.Distance(target) <= Orbwalking.GetRealAutoAttackRange(target) && target.Type == GameObjectType.obj_AI_Hero)
                         {
                             T.Q.Cast();
                             Orbwalking.ResetAutoAttackTimer();
                         }
                         break;
-                    case "LaneClear":
+                    case Orbwalking.OrbwalkingMode.LaneClear:
                         if (T.Q.IsReady() && ObjectManager.Player.Distance(target) <= Orbwalking.GetRealAutoAttackRange(target) && TMenu.Config.Item("useQLC").GetValue<bool>())
                         {
                             T.Q.Cast();
                             Orbwalking.ResetAutoAttackTimer();
                         }
                         break;
-
-
                 }
             }
         }
 
-        private static void OnPossibleInterrupt(Obj_AI_Base sender, InterruptableSpell spell)
+        private static void OnPossibleInterrupt(Obj_AI_Hero sender, InterruptableSpell spell)
         {
             if (sender.IsAlly ||
                 !TMenu.Config.Item("EInterrupt").GetValue<bool>() ||
-                !TMenu.Config.Item("Interr" + spell.Slot).GetValue<bool>())
+                !TMenu.Config.Item("Interr" + spell.Slot + sender.ChampionName).GetValue<bool>())
             {
                 return;
             }
             if (T.E.IsReady() && sender.Distance(ObjectManager.Player) < T.E.Range)
             {
                 T.E.Cast(
-                    ObjectManager.Player.Position.Extend(sender.Position, sender.Distance(ObjectManager.Player) + T.E.Width));
+                    ObjectManager.Player.Position.Extend(sender.Position, sender.Distance(ObjectManager.Player) + T.E.Width/2));
             }
         }
 
         private static void OnGapCloser(ActiveGapcloser gapcloser)
         {
-            if (TMenu.Config.Item("EGap").GetValue<bool>() && 
-                TMenu.Config.Item("Gap" + gapcloser.Slot).GetValue<bool>() &&
-                gapcloser.Sender.IsValidTarget() &&
-                ObjectManager.Player.Distance(gapcloser.Sender.Position) <= T.E.Range)
+            if (!TMenu.Config.Item("EGap").GetValue<bool>() ||
+                !TMenu.Config.Item("Gap" + gapcloser.Slot + gapcloser.Sender.ChampionName).GetValue<bool>() ||
+                !gapcloser.Sender.IsValidTarget() ||
+                !(ObjectManager.Player.Distance(gapcloser.Sender.Position) <= T.E.Range))
             {
-                if (gapcloser.End.Distance(ObjectManager.Player.Position) > gapcloser.Start.Distance(ObjectManager.Player.Position))
-                {
-                    T.E.Cast(gapcloser.Start.Extend(gapcloser.End, T.E.Width + gapcloser.Sender.BoundingRadius));
-                }
-                else
-                {
-                    T.E.Cast(ObjectManager.Player.Position.Extend(gapcloser.End, T.E.Width/2));
-                }
+                return;
+            }
+
+            if (gapcloser.End.Distance(ObjectManager.Player.Position) > gapcloser.Start.Distance(ObjectManager.Player.Position))
+            {
+                T.E.Cast(gapcloser.Start.Extend(gapcloser.End, T.E.Width + gapcloser.Sender.BoundingRadius));
+            }
+            else if (T.Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
+            {
+                T.E.Cast(gapcloser.End.Extend(gapcloser.Start, ObjectManager.Player.BoundingRadius + T.E.Width/2));
+            }
+            else
+            {
+                T.E.Cast(ObjectManager.Player.Position.Extend(gapcloser.End, ObjectManager.Player.BoundingRadius + T.E.Width / 2));
             }
         }
 

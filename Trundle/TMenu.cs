@@ -51,12 +51,14 @@ namespace Trundle
             Config.AddSubMenu(new Menu("Utilities", "utils"));
             Config.SubMenu("utils").AddItem(new MenuItem("useRTanks", "Force R on tanks in Teamfight")).SetValue(false);
             Config.SubMenu("utils").AddSubMenu(new Menu("Anti Gapcloser", "GC"));
+            Config.SubMenu("utils").AddSubMenu(new Menu("Wait for Gapcloser", "waitGC"));
             foreach (var gc in from gc in AntiGapcloser.Spells
                 from enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy)
                 where gc.ChampionName == enemy.ChampionName
                 select gc)
             {
-                Config.SubMenu("utils").SubMenu("GC").AddItem(new MenuItem("Gap" + gc.Slot, gc.ChampionName + " " + gc.Slot.ToString())).SetValue(true);
+                Config.SubMenu("utils").SubMenu("GC").AddItem(new MenuItem("Gap" + gc.Slot + gc.ChampionName, gc.ChampionName + " " + gc.Slot.ToString())).SetValue(true);
+                Config.SubMenu("utils").SubMenu("waitGC").AddItem(new MenuItem("waitGap" + gc.Slot + gc.ChampionName, gc.ChampionName + " " + gc.Slot.ToString())).SetValue(true);
             }
             Config.SubMenu("utils").SubMenu("GC").AddItem(new MenuItem("EGap", "Use E on gapcloser")).SetValue(true);
             Config.SubMenu("utils").AddSubMenu(new Menu("Interrupter", "Inte"));
@@ -65,9 +67,11 @@ namespace Trundle
                 where interr.ChampionName == enemy.ChampionName
                 select interr)
             {
-                Config.SubMenu("utils").SubMenu("Inte").AddItem(new MenuItem("Interr" + interr.Slot, interr.ChampionName + " " + interr.Slot.ToString())).SetValue(true);
+                Config.SubMenu("utils").SubMenu("Inte").AddItem(new MenuItem("Interr" + interr.Slot + interr.ChampionName, interr.ChampionName + " " + interr.Slot.ToString())).SetValue(true);
             }
             Config.SubMenu("utils").SubMenu("Inte").AddItem(new MenuItem("EInterrupt", "Use E to interrupt important spells")).SetValue(true);
+            Config.SubMenu("utils").AddItem(new MenuItem("manualE", "Manual E in Teamfights")).SetValue(true);
+
 
             //Drawings
             Config.AddSubMenu(new Menu("Drawings", "drawings"));

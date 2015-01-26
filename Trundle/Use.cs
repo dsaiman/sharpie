@@ -20,9 +20,23 @@ namespace Trundle
 
         public static void UseECombo(Obj_AI_Hero target)
         {
-            if (T.E.IsReady() && target.Distance(ObjectManager.Player) < T.E.Range - 100f)
+            if (ObjectManager.Player.CountEnemiesInRange(2000f) > 2 && TMenu.Config.Item("manualE").GetValue<bool>())
             {
-                T.E.Cast(ObjectManager.Player.Position.Extend(target.Position, target.Distance(ObjectManager.Player) + 100f));
+                Console.WriteLine("Returning");
+                return;
+            }
+            if ((from spell in target.Spellbook.Spells from gapcloser in AntiGapcloser.Spells where spell.Name.ToLower() == gapcloser.SpellName && 
+                     target.Spellbook.CanUseSpell(spell.Slot) != SpellState.Cooldown &&
+                     TMenu.Config.Item("waitGap" + spell.Slot + target.ChampionName).GetValue<bool>()
+                     select spell).Any())
+            {
+                return;
+            }
+
+            if (T.E.IsReady() && ObjectManager.Player.Distance(target) < T.E.Range)
+            {
+                var pred = T.E.GetPrediction(target);
+                T.E.Cast(target.Position.Extend(pred.UnitPosition, T.E.Width / 2 + target.BoundingRadius));
             }
         }
 
