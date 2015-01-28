@@ -29,17 +29,13 @@ namespace Jarvan4
 
             var pred = J.Spells[SpellSlot.E].GetPrediction(target);
             var castPosition = pred.UnitPosition;
-            if (pred.Hitchance < HitChance.High)
+            if (pred.Hitchance <= HitChance.High)
             {
                 return;
             }
-            if (pred.Hitchance != HitChance.Dashing && pred.Hitchance != HitChance.Immobile)
-            {
-                castPosition = (target.Position.Extend(pred.UnitPosition, 90));
-            }
             J.Spells[SpellSlot.E].Cast(
                 J.Player.Position.Extend(
-                    castPosition, J.Player.Distance(castPosition) + J.Spells[SpellSlot.E].Width/2 - 1));
+                    castPosition, J.Player.Distance(castPosition) + J.Spells[SpellSlot.E].Width/2 ));
         }
 
         public static void UseEQCombo(Obj_AI_Hero target)
