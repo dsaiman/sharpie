@@ -16,7 +16,8 @@ namespace Jarvan4
             }
 
             var pred = J.Spells[SpellSlot.Q].GetPrediction(target);
-            J.Spells[SpellSlot.Q].Cast(pred.CastPosition);
+            if (pred.Hitchance >= HitChance.High)
+                J.Spells[SpellSlot.Q].Cast(pred.CastPosition);
         }
 
         public static void UseECombo(Obj_AI_Hero target)
