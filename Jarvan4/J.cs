@@ -35,9 +35,9 @@ namespace Jarvan4
         public static Spell Flash;
         
         public static readonly Dictionary<SpellSlot, Spell> Spells = new Dictionary<SpellSlot, Spell> {
-	        {SpellSlot.Q, new Spell(SpellSlot.Q, 770)},
+	        {SpellSlot.Q, new Spell(SpellSlot.Q, 760)},
 	        {SpellSlot.W, new Spell(SpellSlot.W, 525)},
-	        {SpellSlot.E, new Spell(SpellSlot.E, 810)},
+	        {SpellSlot.E, new Spell(SpellSlot.E, 800)},
 	        {SpellSlot.R, new Spell(SpellSlot.R, 610)}
         };
         #endregion
@@ -62,7 +62,7 @@ namespace Jarvan4
                 Use.UseEQCombo(target);
             else if (target.Distance(Player) < Spells[SpellSlot.E].Range + Spells[SpellSlot.W].Range && target.HealthPercentage() < 50 && Spells[SpellSlot.W].IsReady())
                 Use.UseEQ(target);
-            if (target.Distance(Player) < Spells[SpellSlot.Q].Range - 50)
+            if (target.Distance(Player) < Spells[SpellSlot.Q].Range && !Spells[SpellSlot.E].IsReady())
                 Use.UseQCombo(target);
             if (target.Distance(Player) < Spells[SpellSlot.W].Range)
                 Use.UseWCombo(target);
