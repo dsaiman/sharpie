@@ -8,7 +8,7 @@ using LeagueSharp.Common;
 // xQx Potion Manager
 namespace Jarvan4
 {
-    internal class PotionManager
+    class PotionManager
     {
         private enum PotionType
         {

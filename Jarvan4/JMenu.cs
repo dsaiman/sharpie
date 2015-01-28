@@ -13,6 +13,7 @@ namespace Jarvan4
         public static Menu Config;
         public static Menu MenuExtras;
 
+
         public static void AddMenu()
         {
             Config = new Menu("Jarvan", "Jarvan", true);
@@ -87,16 +88,18 @@ namespace Jarvan4
             Config.SubMenu("drawings").AddItem(new MenuItem("drawR", "Draw R range")).SetValue(false);
             Config.SubMenu("drawings").AddItem(new MenuItem("drawEQR", "Draw EQR range")).SetValue(false);
 
-
             var dmgAfterComboItem = new MenuItem("DamageAfterCombo", "Damage After Combo").SetValue(true);
             Config.SubMenu("drawings").AddItem(dmgAfterComboItem);
+
+            MenuExtras = new Menu("Potions", "Potions");
+            Config.AddSubMenu(MenuExtras);
+            new PotionManager();
+
             Utility.HpBarDamageIndicator.DamageToUnit = OutgoingDamage.ComboDamage;
             Utility.HpBarDamageIndicator.Enabled = dmgAfterComboItem.GetValue<bool>();
             dmgAfterComboItem.ValueChanged += delegate(object sender, OnValueChangeEventArgs eventArgs)
             { Utility.HpBarDamageIndicator.Enabled = eventArgs.GetNewValue<bool>(); };
 
-            //new PotionManager();
-            //Config.AddSubMenu(MenuExtras);
             Config.AddToMainMenu();
 
         }

@@ -24,7 +24,6 @@ namespace Jarvan4
             {
                 Game.PrintChat("<font color=\"#00BFFF\">Jarvan IV# -</font> Loaded!");
                 JMenu.AddMenu();
-
                 J.SetSkillShots();
                 J.GetSmiteSlot();
 
