@@ -48,7 +48,7 @@ namespace Jarvan4
                 return;
             }
             UseECombo(target);
-            if (ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon") == null)
+            if (ObjectManager.Get<Obj_AI_Base>().Count(obj => obj.Name == "Beacon" && obj.Distance(J.Player) < 900f) < 1)
             {
                 return;
             }
@@ -79,7 +79,7 @@ namespace Jarvan4
             {
                 J.Spells[SpellSlot.E].Cast(J.Player.Position.Extend(target.Position, J.Spells[SpellSlot.E].Range));
             }
-            if (ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon") == null)
+            if (ObjectManager.Get<Obj_AI_Base>().Count(obj => obj.Name == "Beacon" && obj.Distance(J.Player) < 900f) < 1)
             {
                 return;
             }

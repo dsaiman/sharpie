@@ -106,6 +106,10 @@ namespace Jarvan4
                 Use.UseQLC();
             }
 
+            var objects = ObjectManager.Get<Obj_AI_Base>().Where(obj => obj.Distance(J.Player) < 900f && !obj.IsMe);
+            Console.WriteLine(objects.First().Name);
+
+
         }
 
         public static void JungleClear()
