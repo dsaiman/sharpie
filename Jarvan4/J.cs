@@ -125,11 +125,11 @@ namespace Jarvan4
                     JMenu.Config.Item("EQJungle").GetValue<bool>())
                 {
                     Spells[SpellSlot.E].Cast(minion.Position);
-                    if (ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon") == null)
+                    if (ObjectManager.Get<Obj_AI_Base>().Count(obj => obj.Name == "Beacon" && obj.Distance(J.Player) < 900f) < 1)
                     {
                         return;
                     }
-                    Spells[SpellSlot.Q].Cast(ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name=="Beacon").Position);
+                    Spells[SpellSlot.Q].Cast(ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon").Position);
                 }
                 else if (Player.Spellbook.CanUseSpell(SpellSlot.Q) == SpellState.NotLearned)
                 {
