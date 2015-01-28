@@ -127,6 +127,10 @@ namespace Jarvan4
                     }
                     Spells[SpellSlot.Q].Cast(ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name=="Beacon").Position);
                 }
+                else if (Player.Spellbook.CanUseSpell(SpellSlot.Q) == SpellState.NotLearned)
+                {
+                    Spells[SpellSlot.E].Cast(minion.Position);
+                }
                 else
                 {
                     Spells[SpellSlot.Q].Cast(minion.Position);
