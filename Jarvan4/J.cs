@@ -58,11 +58,11 @@ namespace Jarvan4
             {
                 Use.UseSmiteOnChamp(target);
             }
-            if (target.Distance(Player) < Spells[SpellSlot.E].Range)
+            if (target.Distance(Player) < Spells[SpellSlot.E].Range && Spells[SpellSlot.E].IsReady())
                 Use.UseEQCombo(target);
-            else if (target.Distance(Player) < Spells[SpellSlot.E].Range + Spells[SpellSlot.W].Range && target.HealthPercentage() < 50 && Spells[SpellSlot.W].IsReady())
+            else if (target.Distance(Player) < Spells[SpellSlot.E].Range + Spells[SpellSlot.W].Range && Spells[SpellSlot.W].IsReady() && Spells[SpellSlot.E].IsReady())
                 Use.UseEQ(target);
-            if (target.Distance(Player) < Spells[SpellSlot.Q].Range && !Spells[SpellSlot.E].IsReady())
+            else if (target.Distance(Player) < Spells[SpellSlot.Q].Range)
                 Use.UseQCombo(target);
             if (target.Distance(Player) < Spells[SpellSlot.W].Range)
                 Use.UseWCombo(target);
@@ -105,11 +105,6 @@ namespace Jarvan4
             {
                 Use.UseQLC();
             }
-
-            var objects = ObjectManager.Get<Obj_AI_Base>().Where(obj => obj.Distance(J.Player) < 900f && !obj.IsMe);
-            Console.WriteLine(objects.First().Name);
-
-
         }
 
         public static void JungleClear()
@@ -122,19 +117,23 @@ namespace Jarvan4
                             !m.Name.Contains("Mini") && m.Distance(Player.Position) < Spells[SpellSlot.E].Range))
             {
                 if (Spells[SpellSlot.E].IsReady() && Spells[SpellSlot.Q].IsReady() &&
-                    JMenu.Config.Item("EQJungle").GetValue<bool>())
+                    JMenu.Config.Item("EQJungle").GetValue<bool>() && minion.HealthPercentage() > 20)
                 {
                     Spells[SpellSlot.E].Cast(minion.Position);
-                    Use.LastE = Environment.TickCount;
-                    if (Environment.TickCount - Use.LastE >= 500)
-                        Spells[SpellSlot.Q].Cast(
-                            ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon").Position);
+                    {
+                        var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon");
+                        if (objAiBase != null)
+                        {
+                            Spells[SpellSlot.Q].Cast(
+                                objAiBase.Position);
+                        }
+                    }
                 }
                 else if (Player.Spellbook.CanUseSpell(SpellSlot.Q) == SpellState.NotLearned)
                 {
                     Spells[SpellSlot.E].Cast(minion.Position);
                 }
-                else
+                else if (minion.HealthPercentage() > 10)
                 {
                     Spells[SpellSlot.Q].Cast(minion.Position);
                 }

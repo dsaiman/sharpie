@@ -109,6 +109,7 @@ namespace Jarvan4
             Config.SubMenu("drawings").AddItem(new MenuItem("drawQ", "Draw Q range")).SetValue(false);
             Config.SubMenu("drawings").AddItem(new MenuItem("drawE", "Draw E range")).SetValue(false);
             Config.SubMenu("drawings").AddItem(new MenuItem("drawR", "Draw R range")).SetValue(false);
+            Config.SubMenu("drawings").AddItem(new MenuItem("Debug", "Debug Mode")).SetValue(false);
             Config.SubMenu("drawings").AddItem(new MenuItem("drawEQR", "Draw EQR range")).SetValue(false);
 
             var dmgAfterComboItem = new MenuItem("DamageAfterCombo", "Damage After Combo").SetValue(true);

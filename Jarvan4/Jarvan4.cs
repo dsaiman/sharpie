@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
@@ -58,7 +59,6 @@ namespace Jarvan4
                 if (Target.IsValidTarget())
                 {
                     Use.UseEQRCombo(Target);
-                    J.Player.IssueOrder(GameObjectOrder.AttackUnit, Target);
                     J.Combo(Target);
                 }
                 else
@@ -74,7 +74,6 @@ namespace Jarvan4
                 if (Target.IsValidTarget())
                 {
                     Use.UseEQFlashCombo(Target);
-                    J.Player.IssueOrder(GameObjectOrder.AttackUnit, Target);
                     J.Combo(Target);
                 }
                 else
@@ -83,7 +82,7 @@ namespace Jarvan4
                 }
             }
 
-            if (JMenu.Config.Item("EQFlash").GetValue<KeyBind>().Active)
+            if (JMenu.Config.Item("Flee").GetValue<KeyBind>().Active)
             {
                 J.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                 Use.UseEQFlee();
@@ -97,6 +96,13 @@ namespace Jarvan4
                         J.Spells[SpellSlot.E].Range + J.Spells[SpellSlot.W].Range, TargetSelector.DamageType.Physical);
                     if (Target.IsValidTarget())
                     {
+                        var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name.Contains("JarvanIVWall"));
+                        if (
+                            objAiBase != null && objAiBase.CountEnemiesInRange(325) < 1)
+                        {
+                            J.Spells[SpellSlot.R].Cast();
+                        }
+
                         J.Combo(Target);
                     }
                     break;
@@ -147,28 +153,35 @@ namespace Jarvan4
                 return;
             }
 
+
             if (sender.IsMe && args.SData.Name.Contains("Martial") && args.Target.Type == GameObjectType.obj_AI_Hero)
             {
                 OutgoingDamage.PassiveUp = false;
                 Utility.DelayAction.Add(6000, () => OutgoingDamage.PassiveUp = true);
             }
 
-            if (JMenu.Config.Item("TowerTrap").GetValue<bool>() && sender.Distance(J.Player) < 1500f && sender.IsAlly &&
-                sender.Type == GameObjectType.obj_AI_Turret && args.Target.Type == GameObjectType.obj_AI_Hero)
-            {
-                var target = (Obj_AI_Hero) args.Target;
-                if (J.Spells[SpellSlot.R].IsReady() && target.IsValidTarget() &&
-                    target.Distance(J.Player) < J.Spells[SpellSlot.R].Range)
-                {
-                    J.Spells[SpellSlot.R].Cast(target);
-                    if (J.Spells[SpellSlot.Q].IsReady() && J.Spells[SpellSlot.E].IsReady())
-                    {
-                        var castPos = J.Player.Position.Extend(target.Position, J.Spells[SpellSlot.E].Range);
-                        J.Spells[SpellSlot.E].Cast(castPos);
-                        J.Spells[SpellSlot.Q].Cast(castPos);
-                    }
-                }
-            }
+            //if (JMenu.Config.Item("TowerTrap").GetValue<bool>() && sender.Distance(J.Player) < 1500f && sender.IsAlly &&
+            //    sender.Type == GameObjectType.obj_AI_Turret && args.Target.Type == GameObjectType.obj_AI_Hero)
+            //{
+            //    var target = (Obj_AI_Hero) args.Target;
+            //    if (J.Spells[SpellSlot.R].IsReady() && target.IsValidTarget() &&
+            //        target.Distance(J.Player) < J.Spells[SpellSlot.R].Range)
+            //    {
+            //        J.Spells[SpellSlot.R].Cast(target);
+            //        if (J.Spells[SpellSlot.Q].IsReady() && J.Spells[SpellSlot.E].IsReady())
+            //        {
+            //            var castPos = J.Player.Position.Extend(target.Position, J.Spells[SpellSlot.E].Range);
+            //            J.Spells[SpellSlot.E].Cast(castPos);
+            //            Use.LastE = Environment.TickCount;
+            //            if (Environment.TickCount - Use.LastE >= 500)
+            //            {
+            //                J.Spells[SpellSlot.Q].Cast(
+            //                    ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon").Position);
+            //            }
+            //        }
+            //    }
+            //}
+
             if (JMenu.Config.Item("WIncoming").GetValue<bool>() && sender.IsEnemy &&
                 sender.Type == GameObjectType.obj_AI_Hero && args.Target.IsMe && J.Spells[SpellSlot.W].IsReady() &&
                 sender.Distance(J.Player.Position) < J.Spells[SpellSlot.W].Range)
