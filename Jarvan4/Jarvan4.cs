@@ -93,15 +93,15 @@ namespace Jarvan4
             {
                 case Orbwalking.OrbwalkingMode.Combo:
                     Target = TargetSelector.GetTarget(
-                        J.Spells[SpellSlot.E].Range + J.Spells[SpellSlot.W].Range, TargetSelector.DamageType.Physical);
+                        J.Spells[SpellSlot.E].Range + J.Spells[SpellSlot.W].Range + 200, TargetSelector.DamageType.Physical);
                     if (Target.IsValidTarget())
                     {
-                        var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name.Contains("JarvanIVWall"));
-                        if (
-                            objAiBase != null && objAiBase.CountEnemiesInRange(325) < 1)
-                        {
-                            J.Spells[SpellSlot.R].Cast();
-                        }
+                        //var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name.Contains("JarvanIVWall"));
+                        //if (
+                        //    objAiBase != null && objAiBase.CountEnemiesInRange(325) < 1)
+                        //{
+                        //    J.Spells[SpellSlot.R].Cast();
+                        //}
 
                         J.Combo(Target);
                     }

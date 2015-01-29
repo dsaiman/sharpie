@@ -38,23 +38,20 @@ namespace Jarvan4
             }
             J.Spells[SpellSlot.E].Cast(
                 J.Player.Position.Extend(
-                    castPosition, J.Player.Distance(castPosition) + J.Spells[SpellSlot.E].Width / 2));
+                    castPosition, Math.Min(J.Player.Distance(castPosition) + J.Spells[SpellSlot.E].Width / 2, J.Spells[SpellSlot.E].Range)));
         }
 
         public static void UseEQCombo(Obj_AI_Hero target)
         {
-            if (J.Spells[SpellSlot.Q].IsReady())
-            {
                 UseECombo(target);
-                var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon");
+                var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon" && obj.Distance(J.Player.Position) <= J.Spells[SpellSlot.Q].Range);
                 if (objAiBase != null) {
                     var eqRectangle = new Geometry.Polygon.Rectangle(
                         J.Player.Position, objAiBase.Position, 180);
-                    if (eqRectangle.IsInside(target.Position))
+                    if ((eqRectangle.IsInside(target.Position)) && J.Spells[SpellSlot.Q].IsReady())
                     {
                         J.Spells[SpellSlot.Q].Cast(objAiBase.Position);
                     }
-                }
             }
         }
 
@@ -66,7 +63,7 @@ namespace Jarvan4
             }
             if (J.Spells[SpellSlot.Q].IsReady())
             {
-                var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon");
+                var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon" && obj.Distance(J.Player.Position) <= J.Spells[SpellSlot.Q].Range);
                 if (objAiBase != null)
                 {
                     J.Spells[SpellSlot.Q].Cast(
@@ -77,17 +74,14 @@ namespace Jarvan4
 
         public static void UseEQFlashCombo(Obj_AI_Hero target)
         {
-            if (J.Player.Spellbook.CanUseSpell(J.FlashSlot) != SpellState.Ready)
-            {
-                return;
-            }
+            
             if (J.Spells[SpellSlot.E].IsReady())
             {
                 J.Spells[SpellSlot.E].Cast(J.Player.Position.Extend(target.Position, J.Spells[SpellSlot.E].Range));
             }
             if (J.Spells[SpellSlot.Q].IsReady())
             {
-                var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon");
+                var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon" && obj.Distance(J.Player.Position) <= J.Spells[SpellSlot.Q].Range);
                 if (objAiBase != null)
                 {
                     J.Spells[SpellSlot.Q].Cast(objAiBase.Position);
@@ -96,9 +90,9 @@ namespace Jarvan4
             }
 
             //Utility.DelayAction.Add(750, () => J.Player.Spellbook.CastSpell(J.FlashSlot, target.Position));
-            if (Environment.TickCount - LastQ >= 150 && target.Distance(J.Player.Position) <= 390)
+            if (J.Player.Spellbook.CanUseSpell(J.FlashSlot) == SpellState.Ready && Environment.TickCount - LastQ >= 150 && target.Distance(J.Player.ServerPosition) <= 390)
             {
-                J.Player.Spellbook.CastSpell(J.FlashSlot, target.Position);
+                J.Player.Spellbook.CastSpell(J.FlashSlot, target.ServerPosition);
             }
         }
 
@@ -157,7 +151,7 @@ namespace Jarvan4
             }
             if (J.Spells[SpellSlot.Q].IsReady())
             {
-                var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon");
+                var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon" && obj.Distance(J.Player.Position) < J.Spells[SpellSlot.Q].Range);
                 if (objAiBase != null)
                 {
                     J.Spells[SpellSlot.Q].Cast(objAiBase.Position);

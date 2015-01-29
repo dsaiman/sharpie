@@ -35,7 +35,7 @@ namespace Jarvan4
         public static Spell Flash;
         
         public static readonly Dictionary<SpellSlot, Spell> Spells = new Dictionary<SpellSlot, Spell> {
-	        {SpellSlot.Q, new Spell(SpellSlot.Q, 760)},
+	        {SpellSlot.Q, new Spell(SpellSlot.Q, 800)},
 	        {SpellSlot.W, new Spell(SpellSlot.W, 525)},
 	        {SpellSlot.E, new Spell(SpellSlot.E, 800)},
 	        {SpellSlot.R, new Spell(SpellSlot.R, 610)}
@@ -58,11 +58,11 @@ namespace Jarvan4
             {
                 Use.UseSmiteOnChamp(target);
             }
-            if (target.Distance(Player) < Spells[SpellSlot.E].Range && Spells[SpellSlot.E].IsReady())
+            if (target.Distance(Player) < Spells[SpellSlot.E].Range)
                 Use.UseEQCombo(target);
-            else if (target.Distance(Player) < Spells[SpellSlot.E].Range + Spells[SpellSlot.W].Range && Spells[SpellSlot.W].IsReady() && Spells[SpellSlot.E].IsReady())
+            else if (target.Distance(Player) < Spells[SpellSlot.E].Range + Spells[SpellSlot.W].Range && Spells[SpellSlot.W].IsReady() && target.HealthPercentage() < 50)
                 Use.UseEQ(target);
-            else if (target.Distance(Player) < Spells[SpellSlot.Q].Range)
+            if (target.Distance(Player) < Spells[SpellSlot.Q].Range)
                 Use.UseQCombo(target);
             if (target.Distance(Player) < Spells[SpellSlot.W].Range)
                 Use.UseWCombo(target);
@@ -121,7 +121,7 @@ namespace Jarvan4
                 {
                     Spells[SpellSlot.E].Cast(minion.Position);
                     {
-                        var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon");
+                        var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon" && obj.Distance(J.Player.Position) < J.Spells[SpellSlot.Q].Range);
                         if (objAiBase != null)
                         {
                             Spells[SpellSlot.Q].Cast(
