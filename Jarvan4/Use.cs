@@ -5,7 +5,7 @@ using LeagueSharp.Common;
 
 namespace Jarvan4
 {
-    class Use
+    internal class Use
     {
         public static int LastE;
         public static int LastQ;
@@ -18,14 +18,15 @@ namespace Jarvan4
             {
                 return;
             }
-                        if (Environment.TickCount - LastE >= 500)
+            if (Environment.TickCount - LastE >= 500)
 
-                        {
-                            var pred = J.Spells[SpellSlot.Q].GetPrediction(target);
-                            if (pred.Hitchance >= HitChance.High)
-                                J.Spells[SpellSlot.Q].Cast(pred.CastPosition);
-                            
-                        }
+            {
+                var pred = J.Spells[SpellSlot.Q].GetPrediction(target);
+                if (pred.Hitchance >= HitChance.High)
+                {
+                    J.Spells[SpellSlot.Q].Cast(pred.CastPosition);
+                }
+            }
         }
 
         public static void UseECombo(Obj_AI_Hero target)
@@ -43,7 +44,7 @@ namespace Jarvan4
             }
             J.Spells[SpellSlot.E].Cast(
                 J.Player.Position.Extend(
-                    castPosition, J.Player.Distance(castPosition) + J.Spells[SpellSlot.E].Width/2 ));
+                    castPosition, J.Player.Distance(castPosition) + J.Spells[SpellSlot.E].Width / 2));
             LastE = Environment.TickCount;
         }
 
@@ -58,12 +59,13 @@ namespace Jarvan4
             {
                 var eqRectangle = new Geometry.Polygon.Rectangle(
                     J.Player.Position, ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon").Position, 180);
-            if (eqRectangle.IsInside(target.Position))
-            {
-                J.Spells[SpellSlot.Q].Cast(ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon").Position);
+                if (eqRectangle.IsInside(target.Position))
+                {
+                    J.Spells[SpellSlot.Q].Cast(
+                        ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon").Position);
+                }
             }
         }
-    }
 
         public static void UseEQ(Obj_AI_Hero target)
         {
@@ -92,7 +94,7 @@ namespace Jarvan4
                 J.Spells[SpellSlot.Q].Cast(ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon").Position);
             }
             LastQ = Environment.TickCount;
-            
+
             //Utility.DelayAction.Add(750, () => J.Player.Spellbook.CastSpell(J.FlashSlot, target.Position));
             if (Environment.TickCount - LastQ >= 250 && target.Distance(J.Player) <= 390)
             {
@@ -130,16 +132,37 @@ namespace Jarvan4
 
         public static bool GapUsed(Obj_AI_Hero target)
         {
-            if ((from spell in target.Spellbook.Spells from gapcloser in AntiGapcloser.Spells where spell.Name.ToLower() == gapcloser.SpellName && 
-                     target.Spellbook.CanUseSpell(spell.Slot) != SpellState.Cooldown &&
-                     JMenu.Config.Item("waitGap" + spell.Slot + target.ChampionName).GetValue<bool>()
-                     select spell).Any())
+            if ((from spell in target.Spellbook.Spells
+                from gapcloser in AntiGapcloser.Spells
+                where
+                    spell.Name.ToLower() == gapcloser.SpellName &&
+                    target.Spellbook.CanUseSpell(spell.Slot) != SpellState.Cooldown &&
+                    JMenu.Config.Item("waitGap" + spell.Slot + target.ChampionName).GetValue<bool>()
+                select spell).Any())
+            {
                 return false;
+            }
             return true;
         }
+
         #endregion
 
         #region Mixed and LC
+
+        public static void UseEQFlee()
+        {
+            if (!J.Spells[SpellSlot.E].IsReady())
+            {
+                return;
+            }
+            J.Spells[SpellSlot.E].Cast(J.Player.Position.Extend(Game.CursorPos, J.Spells[SpellSlot.E].Range));
+            LastE = Environment.TickCount;
+            if (Environment.TickCount - LastE >= 500)
+            {
+                J.Spells[SpellSlot.Q].Cast(ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon").Position);
+            }
+        }
+
         public static void UseQMixed(Obj_AI_Hero target)
         {
             if (!J.Spells[SpellSlot.Q].IsReady())
@@ -149,7 +172,9 @@ namespace Jarvan4
 
             var pred = J.Spells[SpellSlot.Q].GetPrediction(target);
             if (pred.Hitchance >= HitChance.High)
+            {
                 J.Spells[SpellSlot.Q].Cast(pred.CastPosition);
+            }
         }
 
         public static void UseQLC()
@@ -170,17 +195,21 @@ namespace Jarvan4
             var bestQFarm = MinionManager.GetBestLineFarmLocation(
                 qMinionsPositions, J.Spells[SpellSlot.Q].Width, J.Spells[SpellSlot.Q].Range);
             if (bestQFarm.MinionsHit > 2)
+            {
                 J.Spells[SpellSlot.Q].Cast(bestQFarm.Position);
+            }
         }
+
         #endregion
 
         #region CommonUse
+
         public static void UseIgnite(Obj_AI_Hero target)
         {
-            if (J.IgniteSlot != SpellSlot.Unknown &&
-                J.Player.Spellbook.CanUseSpell(J.IgniteSlot) == SpellState.Ready)
+            if (J.IgniteSlot != SpellSlot.Unknown && J.Player.Spellbook.CanUseSpell(J.IgniteSlot) == SpellState.Ready)
             {
-                if (target.Health <= J.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite) || OutgoingDamage.ComboDamage(target) >= target.Health)
+                if (target.Health <= J.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite) ||
+                    OutgoingDamage.ComboDamage(target) >= target.Health)
                 {
                     J.Player.Spellbook.CastSpell(J.IgniteSlot, target);
                 }
@@ -218,8 +247,7 @@ namespace Jarvan4
         public static void UseComboItems(Obj_AI_Hero target)
         {
             //BOTRK and Cutlass
-            if ((!J.Spells[SpellSlot.E].IsReady() &&
-                !J.Spells[SpellSlot.Q].IsReady() &&
+            if ((!J.Spells[SpellSlot.E].IsReady() && !J.Spells[SpellSlot.Q].IsReady() &&
                  target.Distance(J.Player) > J.Player.AttackRange + target.BoundingRadius) ||
                 J.Player.HealthPercentage() < 40)
             {
@@ -249,32 +277,33 @@ namespace Jarvan4
             }
 
             //Locket
-            if (Items.CanUseItem(3190) && 
-                (J.Player.CountEnemiesInRange(600f) > 1 && J.Player.CountAlliesInRange(600f) > 1) || 
+            if (Items.CanUseItem(3190) &&
+                (J.Player.CountEnemiesInRange(600f) > 1 && J.Player.CountAlliesInRange(600f) > 1) ||
                 J.Player.CountEnemiesInRange(600f) > 2)
             {
                 Items.UseItem(3190);
             }
 
             //Randuin
-            if (Items.CanUseItem(3143) && (J.Player.CountEnemiesInRange(500f) > 1 || 
-                (target.Distance(J.Player) > J.Player.AttackRange && !J.Spells[SpellSlot.E].IsReady() && target.Distance(J.Player) < 500f)))
+            if (Items.CanUseItem(3143) &&
+                (J.Player.CountEnemiesInRange(500f) > 1 ||
+                 (target.Distance(J.Player) > J.Player.AttackRange && !J.Spells[SpellSlot.E].IsReady() &&
+                  target.Distance(J.Player) < 500f)))
             {
                 Items.UseItem(3143);
             }
-
         }
 
         public static void UseSmiteOnChamp(Obj_AI_Hero target)
         {
             if (target.IsValidTarget(J.Spells[SpellSlot.E].Range) && J.SmiteSlot != SpellSlot.Unknown &&
                 ObjectManager.Player.Spellbook.CanUseSpell((J.SmiteSlot)) == SpellState.Ready &&
-                (J.GetSmiteType() == "s5_summonersmiteplayerganker" ||
-                 J.GetSmiteType() == "s5_summonersmiteduel"))
+                (J.GetSmiteType() == "s5_summonersmiteplayerganker" || J.GetSmiteType() == "s5_summonersmiteduel"))
             {
                 ObjectManager.Player.Spellbook.CastSpell(J.SmiteSlot, target);
             }
         }
+
         #endregion
     }
 }

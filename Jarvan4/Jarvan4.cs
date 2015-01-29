@@ -6,9 +6,10 @@ using System.Drawing;
 
 namespace Jarvan4
 {
-    class Jarvan4
+    internal class Jarvan4
     {
         #region Load
+
         public const string CharName = "JarvanIV";
 
         public static Obj_AI_Hero Target;
@@ -39,6 +40,7 @@ namespace Jarvan4
                 Game.PrintChat("Oops. Something went wrong with JarvanIV");
             }
         }
+
         #endregion
 
         private static void OnGameUpdate(EventArgs args)
@@ -75,18 +77,24 @@ namespace Jarvan4
                     J.Player.IssueOrder(GameObjectOrder.AttackUnit, Target);
                     J.Combo(Target);
                 }
-            else
-            {
-                J.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+                else
+                {
+                    J.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+                }
             }
 
-        }
+            if (JMenu.Config.Item("EQFlash").GetValue<KeyBind>().Active)
+            {
+                J.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+                Use.UseEQFlee();
+            }
 
 
             switch (J.Orbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
-                    Target = TargetSelector.GetTarget(J.Spells[SpellSlot.E].Range + J.Spells[SpellSlot.W].Range, TargetSelector.DamageType.Physical);
+                    Target = TargetSelector.GetTarget(
+                        J.Spells[SpellSlot.E].Range + J.Spells[SpellSlot.W].Range, TargetSelector.DamageType.Physical);
                     if (Target.IsValidTarget())
                     {
                         J.Combo(Target);
@@ -104,7 +112,9 @@ namespace Jarvan4
                 case Orbwalking.OrbwalkingMode.LaneClear:
                     J.LaneClear();
                     if (JMenu.Config.Item("JungleMode").GetValue<bool>())
+                    {
                         J.JungleClear();
+                    }
                     break;
             }
         }
@@ -125,21 +135,22 @@ namespace Jarvan4
             }
             if (JMenu.Config.Item("drawEQR").GetValue<bool>())
             {
-                Render.Circle.DrawCircle(J.Player.Position, J.Spells[SpellSlot.E].Range + J.Spells[SpellSlot.R].Range - 60, Color.DarkBlue);
+                Render.Circle.DrawCircle(
+                    J.Player.Position, J.Spells[SpellSlot.E].Range + J.Spells[SpellSlot.R].Range - 60, Color.DarkBlue);
             }
-
         }
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (J.Player.IsDead ||
-                J.Player.InFountain())
+            if (J.Player.IsDead || J.Player.InFountain())
+            {
                 return;
+            }
 
             if (sender.IsMe && args.SData.Name.Contains("Martial") && args.Target.Type == GameObjectType.obj_AI_Hero)
             {
-                    OutgoingDamage.PassiveUp = false;
-                    Utility.DelayAction.Add(6000, () => OutgoingDamage.PassiveUp = true);
+                OutgoingDamage.PassiveUp = false;
+                Utility.DelayAction.Add(6000, () => OutgoingDamage.PassiveUp = true);
             }
 
             if (JMenu.Config.Item("TowerTrap").GetValue<bool>() && sender.Distance(J.Player) < 1500f && sender.IsAlly &&
@@ -158,36 +169,39 @@ namespace Jarvan4
                     }
                 }
             }
-            if (JMenu.Config.Item("WIncoming").GetValue<bool>() && sender.IsEnemy && sender.Type == GameObjectType.obj_AI_Hero && args.Target.IsMe && J.Spells[SpellSlot.W].IsReady() &&             
+            if (JMenu.Config.Item("WIncoming").GetValue<bool>() && sender.IsEnemy &&
+                sender.Type == GameObjectType.obj_AI_Hero && args.Target.IsMe && J.Spells[SpellSlot.W].IsReady() &&
                 sender.Distance(J.Player.Position) < J.Spells[SpellSlot.W].Range)
+            {
                 J.Spells[SpellSlot.W].Cast();
+            }
         }
 
         private static void OnGapCloser(ActiveGapcloser gapcloser)
         {
-            if (!JMenu.Config.Item("WGap").GetValue<bool>() ||
-                !gapcloser.Sender.IsValidTarget() ||
+            if (!JMenu.Config.Item("WGap").GetValue<bool>() || !gapcloser.Sender.IsValidTarget() ||
                 !(ObjectManager.Player.Distance(gapcloser.Sender.Position) <= J.Spells[SpellSlot.W].Range))
             {
                 return;
             }
             if (gapcloser.End.Distance(J.Player.Position) < J.Spells[SpellSlot.W].Range)
+            {
                 J.Spells[SpellSlot.W].Cast();
+            }
         }
 
         private static void OnPossibleInterrupt(Obj_AI_Hero sender, InterruptableSpell spell)
         {
-            if (sender.IsAlly ||
-            !JMenu.Config.Item("EQInterrupt").GetValue<bool>() ||
-            !JMenu.Config.Item("Interr" + spell.Slot + sender.ChampionName).GetValue<bool>())
+            if (sender.IsAlly || !JMenu.Config.Item("EQInterrupt").GetValue<bool>() ||
+                !JMenu.Config.Item("Interr" + spell.Slot + sender.ChampionName).GetValue<bool>())
             {
                 return;
             }
-            if (J.Spells[SpellSlot.E].IsReady() && J.Spells[SpellSlot.Q].IsReady() && sender.Distance(ObjectManager.Player) < J.Spells[SpellSlot.E].Range)
+            if (J.Spells[SpellSlot.E].IsReady() && J.Spells[SpellSlot.Q].IsReady() &&
+                sender.Distance(ObjectManager.Player) < J.Spells[SpellSlot.E].Range)
             {
                 Use.UseEQCombo(sender);
             }
-
         }
     }
 }

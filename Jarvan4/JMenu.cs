@@ -8,7 +8,7 @@ using LeagueSharp.Common;
 
 namespace Jarvan4
 {
-    class JMenu
+    internal class JMenu
     {
         public static Menu Config;
         public static Menu MenuExtras;
@@ -29,8 +29,16 @@ namespace Jarvan4
 
             //Combo
             Config.AddSubMenu(new Menu("Combo", "combo"));
-            Config.SubMenu("combo").AddItem(new MenuItem("EQR", "EQR Reaching Combo").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
-            Config.SubMenu("combo").AddItem(new MenuItem("EQFlash", "EQ Flash Reaching Combo").SetValue(new KeyBind("A".ToCharArray()[0], KeyBindType.Press)));
+            Config.SubMenu("combo")
+                .AddItem(
+                    new MenuItem("EQR", "EQR Reaching Combo").SetValue(
+                        new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
+            Config.SubMenu("combo")
+                .AddItem(
+                    new MenuItem("EQFlash", "EQ Flash Reaching Combo").SetValue(
+                        new KeyBind("A".ToCharArray()[0], KeyBindType.Press)));
+            Config.SubMenu("combo")
+                .AddItem(new MenuItem("Flee", "Flee").SetValue(new KeyBind("Z".ToCharArray()[0], KeyBindType.Press)));
             Config.SubMenu("combo").AddItem(new MenuItem("comboItems", "Use Items")).SetValue(true);
             Config.SubMenu("combo").AddItem(new MenuItem("useIgniteCombo", "Use Ignite")).SetValue(true);
             Config.SubMenu("combo").AddItem(new MenuItem("useSmiteCombo", "Use Smite on champ")).SetValue(true);
@@ -50,7 +58,9 @@ namespace Jarvan4
 
             // Utilities
             Config.AddSubMenu(new Menu("Utilities", "utils"));
-            Config.SubMenu("utils").AddItem(new MenuItem("WIncoming", "Use W on Incoming Damage (with slow check)")).SetValue(false);
+            Config.SubMenu("utils")
+                .AddItem(new MenuItem("WIncoming", "Use W on Incoming Damage (with slow check)"))
+                .SetValue(false);
             Config.SubMenu("utils").AddItem(new MenuItem("NoRTower", "Never R under enemy tower")).SetValue(false);
             Config.SubMenu("utils").AddItem(new MenuItem("TowerTrap", "Under tower R outplay :^)")).SetValue(false);
             Config.SubMenu("utils").AddSubMenu(new Menu("Always R", "alwR"));
@@ -62,23 +72,36 @@ namespace Jarvan4
             }
             Config.SubMenu("utils").AddSubMenu(new Menu("Wait for Gapcloser to R", "waitGC"));
             foreach (var gc in from gc in AntiGapcloser.Spells
-                               from enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy)
-                               where gc.ChampionName == enemy.ChampionName
-                               select gc)
+                from enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy)
+                where gc.ChampionName == enemy.ChampionName
+                select gc)
             {
-                Config.SubMenu("utils").SubMenu("waitGC").AddItem(new MenuItem("waitGap" + gc.Slot + gc.ChampionName, gc.ChampionName + " " + gc.Slot.ToString())).SetValue(true);
+                Config.SubMenu("utils")
+                    .SubMenu("waitGC")
+                    .AddItem(
+                        new MenuItem("waitGap" + gc.Slot + gc.ChampionName, gc.ChampionName + " " + gc.Slot.ToString()))
+                    .SetValue(true);
             }
             Config.SubMenu("utils").AddSubMenu(new Menu("Anti Gapcloser", "GC"));
             Config.SubMenu("utils").SubMenu("GC").AddItem(new MenuItem("WGap", "Use W on gapcloser")).SetValue(true);
             Config.SubMenu("utils").AddSubMenu(new Menu("Interrupter", "Inte"));
             foreach (var interr in from interr in Interrupter.Spells
-                                   from enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy)
-                                   where interr.ChampionName == enemy.ChampionName
-                                   select interr)
+                from enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy)
+                where interr.ChampionName == enemy.ChampionName
+                select interr)
             {
-                Config.SubMenu("utils").SubMenu("Inte").AddItem(new MenuItem("Interr" + interr.Slot + interr.ChampionName, interr.ChampionName + " " + interr.Slot.ToString())).SetValue(true);
+                Config.SubMenu("utils")
+                    .SubMenu("Inte")
+                    .AddItem(
+                        new MenuItem(
+                            "Interr" + interr.Slot + interr.ChampionName,
+                            interr.ChampionName + " " + interr.Slot.ToString()))
+                    .SetValue(true);
             }
-            Config.SubMenu("utils").SubMenu("Inte").AddItem(new MenuItem("EQInterrupt", "Use E to interrupt important spells")).SetValue(true);
+            Config.SubMenu("utils")
+                .SubMenu("Inte")
+                .AddItem(new MenuItem("EQInterrupt", "Use E to interrupt important spells"))
+                .SetValue(true);
 
 
             //Drawings
@@ -97,11 +120,13 @@ namespace Jarvan4
 
             Utility.HpBarDamageIndicator.DamageToUnit = OutgoingDamage.ComboDamage;
             Utility.HpBarDamageIndicator.Enabled = dmgAfterComboItem.GetValue<bool>();
-            dmgAfterComboItem.ValueChanged += delegate(object sender, OnValueChangeEventArgs eventArgs)
-            { Utility.HpBarDamageIndicator.Enabled = eventArgs.GetNewValue<bool>(); };
+            dmgAfterComboItem.ValueChanged +=
+                delegate(object sender, OnValueChangeEventArgs eventArgs)
+                {
+                    Utility.HpBarDamageIndicator.Enabled = eventArgs.GetNewValue<bool>();
+                };
 
             Config.AddToMainMenu();
-
         }
     }
 }
