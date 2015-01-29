@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 
@@ -6,6 +7,9 @@ namespace Jarvan4
 {
     class Use
     {
+        public static int LastE;
+        public static int LastQ;
+
         #region Combo
 
         public static void UseQCombo(Obj_AI_Hero target)
@@ -14,10 +18,14 @@ namespace Jarvan4
             {
                 return;
             }
+                        if (Environment.TickCount - LastE >= 500)
 
-            var pred = J.Spells[SpellSlot.Q].GetPrediction(target);
-            if (pred.Hitchance >= HitChance.High)
-                J.Spells[SpellSlot.Q].Cast(pred.CastPosition);
+                        {
+                            var pred = J.Spells[SpellSlot.Q].GetPrediction(target);
+                            if (pred.Hitchance >= HitChance.High)
+                                J.Spells[SpellSlot.Q].Cast(pred.CastPosition);
+                            
+                        }
         }
 
         public static void UseECombo(Obj_AI_Hero target)
@@ -36,6 +44,7 @@ namespace Jarvan4
             J.Spells[SpellSlot.E].Cast(
                 J.Player.Position.Extend(
                     castPosition, J.Player.Distance(castPosition) + J.Spells[SpellSlot.E].Width/2 ));
+            LastE = Environment.TickCount;
         }
 
         public static void UseEQCombo(Obj_AI_Hero target)
@@ -45,16 +54,16 @@ namespace Jarvan4
                 return;
             }
             UseECombo(target);
-            if (ObjectManager.Get<Obj_AI_Base>().Count(obj => obj.Name == "Beacon" && obj.Distance(J.Player) < 900f) < 1)
+            if (Environment.TickCount - LastE >= 500)
             {
-                return;
-            }
-            var eqRectangle = new Geometry.Polygon.Rectangle(J.Player.Position, ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name=="Beacon").Position, 180);
+                var eqRectangle = new Geometry.Polygon.Rectangle(
+                    J.Player.Position, ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon").Position, 180);
             if (eqRectangle.IsInside(target.Position))
             {
-                J.Spells[SpellSlot.Q].Cast(ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name=="Beacon").Position);
+                J.Spells[SpellSlot.Q].Cast(ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon").Position);
             }
         }
+    }
 
         public static void UseEQ(Obj_AI_Hero target)
         {
@@ -63,6 +72,7 @@ namespace Jarvan4
                 return;
             }
             J.Spells[SpellSlot.E].Cast(J.Player.Position.Extend(target.Position, J.Spells[SpellSlot.E].Range));
+            LastE = Environment.TickCount;
             UseQCombo(target);
         }
 
@@ -76,15 +86,18 @@ namespace Jarvan4
             {
                 J.Spells[SpellSlot.E].Cast(J.Player.Position.Extend(target.Position, J.Spells[SpellSlot.E].Range));
             }
-            if (ObjectManager.Get<Obj_AI_Base>().Count(obj => obj.Name == "Beacon" && obj.Distance(J.Player) < 900f) < 1)
-            {
-                return;
-            }
-            if (J.Spells[SpellSlot.Q].IsReady())
+            LastE = Environment.TickCount;
+            if (J.Spells[SpellSlot.Q].IsReady() && Environment.TickCount - LastE >= 500)
             {
                 J.Spells[SpellSlot.Q].Cast(ObjectManager.Get<Obj_AI_Base>().First(obj => obj.Name == "Beacon").Position);
             }
-            Utility.DelayAction.Add(750, () => J.Player.Spellbook.CastSpell(J.FlashSlot, target.Position));
+            LastQ = Environment.TickCount;
+            
+            //Utility.DelayAction.Add(750, () => J.Player.Spellbook.CastSpell(J.FlashSlot, target.Position));
+            if (Environment.TickCount - LastQ >= 250 && target.Distance(J.Player) <= 390)
+            {
+                J.Player.Spellbook.CastSpell(J.FlashSlot, target.Position);
+            }
         }
 
         public static void UseEQRCombo(Obj_AI_Hero target)
