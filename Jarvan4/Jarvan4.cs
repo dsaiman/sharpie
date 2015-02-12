@@ -74,7 +74,6 @@ namespace Jarvan4
                 if (Target.IsValidTarget())
                 {
                     Use.UseEQFlashCombo(Target);
-                    J.Combo(Target);
                 }
                 else
                 {
