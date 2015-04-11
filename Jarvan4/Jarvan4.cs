@@ -30,9 +30,9 @@ namespace Jarvan4
                 J.GetSmiteSlot();
 
                 Drawing.OnDraw += OnDraw;
-                Game.OnGameUpdate += OnGameUpdate;
+                Game.OnUpdate += OnGameUpdate;
                 Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
-                Interrupter.OnPossibleToInterrupt += OnPossibleInterrupt;
+                Interrupter2.OnInterruptableTarget += OnPossibleInterrupt;
                 AntiGapcloser.OnEnemyGapcloser += OnGapCloser;
             }
 
@@ -52,9 +52,15 @@ namespace Jarvan4
                 return;
             }
 
+            if (Environment.TickCount - Use.LastE >= 280)
+            {
+                Use.UsedE = true;
+                Utility.DelayAction.Add(8000, () => Use.UsedE = false);
+            }
+
             if (JMenu.Config.Item("EQR").GetValue<KeyBind>().Active)
             {
-                var fullRange = J.Spells[SpellSlot.E].Range + J.Spells[SpellSlot.R].Range - 60;
+                var fullRange = J.Spells[SpellSlot.E].Range + J.Spells[SpellSlot.R].Range;
                 Target = TargetSelector.GetTarget(fullRange, TargetSelector.DamageType.Physical);
                 if (Target.IsValidTarget())
                 {
@@ -69,11 +75,12 @@ namespace Jarvan4
 
             if (JMenu.Config.Item("EQFlash").GetValue<KeyBind>().Active)
             {
-                var fullRange = J.Spells[SpellSlot.E].Range + 380;
+                var fullRange = J.Spells[SpellSlot.E].Range + 400;
                 Target = TargetSelector.GetTarget(fullRange, TargetSelector.DamageType.Physical);
                 if (Target.IsValidTarget())
                 {
                     Use.UseEQFlashCombo(Target);
+                    J.Combo(Target);
                 }
                 else
                 {
@@ -83,8 +90,8 @@ namespace Jarvan4
 
             if (JMenu.Config.Item("Flee").GetValue<KeyBind>().Active)
             {
+                Use.UseEQFlee(); 
                 J.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-                Use.UseEQFlee();
             }
 
 
@@ -92,7 +99,7 @@ namespace Jarvan4
             {
                 case Orbwalking.OrbwalkingMode.Combo:
                     Target = TargetSelector.GetTarget(
-                        J.Spells[SpellSlot.E].Range + J.Spells[SpellSlot.W].Range + 200, TargetSelector.DamageType.Physical);
+                        J.Spells[SpellSlot.E].Range + J.Spells[SpellSlot.W].Range + 600f, TargetSelector.DamageType.Physical);
                     if (Target.IsValidTarget())
                     {
                         //var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name.Contains("JarvanIVWall"));
@@ -128,20 +135,20 @@ namespace Jarvan4
         {
             if (JMenu.Config.Item("drawQ").GetValue<bool>())
             {
-                Render.Circle.DrawCircle(J.Player.Position, J.Spells[SpellSlot.Q].Range, Color.DarkRed);
+                Render.Circle.DrawCircle(J.Player.ServerPosition, J.Spells[SpellSlot.Q].Range, Color.DarkRed);
             }
             if (JMenu.Config.Item("drawE").GetValue<bool>())
             {
-                Render.Circle.DrawCircle(J.Player.Position, J.Spells[SpellSlot.E].Range, Color.DeepPink);
+                Render.Circle.DrawCircle(J.Player.ServerPosition, J.Spells[SpellSlot.E].Range, Color.DeepPink);
             }
             if (JMenu.Config.Item("drawR").GetValue<bool>())
             {
-                Render.Circle.DrawCircle(J.Player.Position, J.Spells[SpellSlot.R].Range, Color.GreenYellow);
+                Render.Circle.DrawCircle(J.Player.ServerPosition, J.Spells[SpellSlot.R].Range, Color.GreenYellow);
             }
             if (JMenu.Config.Item("drawEQR").GetValue<bool>())
             {
                 Render.Circle.DrawCircle(
-                    J.Player.Position, J.Spells[SpellSlot.E].Range + J.Spells[SpellSlot.R].Range - 60, Color.DarkBlue);
+                    J.Player.ServerPosition, J.Spells[SpellSlot.E].Range + J.Spells[SpellSlot.R].Range - 60, Color.DarkBlue);
             }
         }
 
@@ -183,7 +190,7 @@ namespace Jarvan4
 
             if (JMenu.Config.Item("WIncoming").GetValue<bool>() && sender.IsEnemy &&
                 sender.Type == GameObjectType.obj_AI_Hero && args.Target.IsMe && J.Spells[SpellSlot.W].IsReady() &&
-                sender.Distance(J.Player.Position) < J.Spells[SpellSlot.W].Range)
+                sender.Distance(J.Player.ServerPosition) < J.Spells[SpellSlot.W].Range)
             {
                 J.Spells[SpellSlot.W].Cast();
             }
@@ -192,25 +199,23 @@ namespace Jarvan4
         private static void OnGapCloser(ActiveGapcloser gapcloser)
         {
             if (!JMenu.Config.Item("WGap").GetValue<bool>() || !gapcloser.Sender.IsValidTarget() ||
-                !(ObjectManager.Player.Distance(gapcloser.Sender.Position) <= J.Spells[SpellSlot.W].Range))
+                !(ObjectManager.Player.Distance(gapcloser.Sender.ServerPosition) <= J.Spells[SpellSlot.W].Range))
             {
                 return;
             }
-            if (gapcloser.End.Distance(J.Player.Position) < J.Spells[SpellSlot.W].Range)
+            if (gapcloser.End.Distance(J.Player.ServerPosition) < J.Spells[SpellSlot.W].Range)
             {
                 J.Spells[SpellSlot.W].Cast();
             }
         }
 
-        private static void OnPossibleInterrupt(Obj_AI_Hero sender, InterruptableSpell spell)
+        private static void OnPossibleInterrupt(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
         {
-            if (sender.IsAlly || !JMenu.Config.Item("EQInterrupt").GetValue<bool>() ||
-                !JMenu.Config.Item("Interr" + spell.Slot + sender.ChampionName).GetValue<bool>())
+            if (sender.IsAlly || !JMenu.Config.Item("EQInterrupt").GetValue<bool>() || args.DangerLevel == Interrupter2.DangerLevel.Low)
             {
                 return;
             }
-            if (J.Spells[SpellSlot.E].IsReady() && J.Spells[SpellSlot.Q].IsReady() &&
-                sender.Distance(ObjectManager.Player) < J.Spells[SpellSlot.E].Range)
+            if (sender.Distance(ObjectManager.Player) < J.Spells[SpellSlot.E].Range && sender.IsValidTarget())
             {
                 Use.UseEQCombo(sender);
             }

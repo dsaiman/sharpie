@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using LeagueSharp;
 using LeagueSharp.Common;
 
@@ -7,21 +8,30 @@ namespace Jarvan4
 {
     internal class Use
     {
-        public static int LastE;
+
         public static int LastQ;
+        public static int LastE;
+        public static bool UsedE = false;
+        public static bool UsedQ = false;
+        public static bool R1Up = false;
+
+        public static SharpDX.Vector3 EPosition;
 
         #region Combo
 
         public static void UseQCombo(Obj_AI_Hero target)
         {
-            if (J.Spells[SpellSlot.Q].IsReady())
+            if (!J.Spells[SpellSlot.Q].IsReady())
             {
-                var pred = J.Spells[SpellSlot.Q].GetPrediction(target);
-                if (pred.Hitchance >= HitChance.High)
-                {
-                    J.Spells[SpellSlot.Q].Cast(pred.CastPosition);
-                }
+                return;
             }
+            var pred = J.Spells[SpellSlot.Q].GetPrediction(target);
+            if (pred.Hitchance < HitChance.High)
+            {
+                return;
+            }
+            J.Spells[SpellSlot.Q].Cast(pred.CastPosition);
+            LastQ = Environment.TickCount;
         }
 
         public static void UseECombo(Obj_AI_Hero target)
@@ -32,78 +42,72 @@ namespace Jarvan4
             }
             var pred = J.Spells[SpellSlot.E].GetPrediction(target);
             var castPosition = pred.UnitPosition;
-            if (pred.Hitchance <= HitChance.High)
+            if (pred.Hitchance < HitChance.High)
             {
                 return;
             }
-            J.Spells[SpellSlot.E].Cast(
-                J.Player.Position.Extend(
-                    castPosition, Math.Min(J.Player.Distance(castPosition) + J.Spells[SpellSlot.E].Width / 2, J.Spells[SpellSlot.E].Range)));
+            EPosition = J.Player.ServerPosition.Extend(
+                castPosition,
+                Math.Min(J.Player.Distance(castPosition) + J.Spells[SpellSlot.E].Width / 2, J.Spells[SpellSlot.E].Range));
+            J.Spells[SpellSlot.E].Cast(EPosition);
+            LastE = Environment.TickCount;
         }
 
         public static void UseEQCombo(Obj_AI_Hero target)
         {
+            if (J.Spells[SpellSlot.Q].IsReady() && J.Spells[SpellSlot.E].IsReady())
+            {
                 UseECombo(target);
-                var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon" && obj.Distance(J.Player.Position) <= J.Spells[SpellSlot.Q].Range);
-                if (objAiBase != null) {
-                    var eqRectangle = new Geometry.Polygon.Rectangle(
-                        J.Player.Position, objAiBase.Position, 180);
-                    if ((eqRectangle.IsInside(target.Position)) && J.Spells[SpellSlot.Q].IsReady())
-                    {
-                        J.Spells[SpellSlot.Q].Cast(objAiBase.Position);
-                    }
+            }
+            if (UsedE && J.Spells[SpellSlot.Q].IsReady())
+            {
+                var eqRectangle = new Geometry.Polygon.Rectangle(
+                    J.Player.ServerPosition, EPosition, 180);
+                if ((eqRectangle.IsInside(target.ServerPosition)))
+                {
+                    J.Spells[SpellSlot.Q].Cast(EPosition);
+                }
             }
         }
 
         public static void UseEQ(Obj_AI_Hero target)
         {
-            if (J.Spells[SpellSlot.E].IsReady())
+            if (J.Spells[SpellSlot.E].IsReady() && J.Spells[SpellSlot.Q].IsReady())
             {
-                J.Spells[SpellSlot.E].Cast(J.Player.Position.Extend(target.Position, J.Spells[SpellSlot.E].Range));
+                EPosition = J.Player.ServerPosition.Extend(target.ServerPosition, J.Spells[SpellSlot.E].Range + 100f);
+                J.Spells[SpellSlot.E].Cast(EPosition);
+                LastE = Environment.TickCount;
             }
-            if (J.Spells[SpellSlot.Q].IsReady())
+            if (UsedE && J.Spells[SpellSlot.Q].IsReady())
             {
-                var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon" && obj.Distance(J.Player.Position) <= J.Spells[SpellSlot.Q].Range);
-                if (objAiBase != null)
-                {
-                    J.Spells[SpellSlot.Q].Cast(
-                        objAiBase.Position);
-                }
+                J.Spells[SpellSlot.Q].Cast(EPosition);
             }
         }
 
         public static void UseEQFlashCombo(Obj_AI_Hero target)
         {
-            
-            if (J.Spells[SpellSlot.E].IsReady())
-            {
-                J.Spells[SpellSlot.E].Cast(J.Player.Position.Extend(target.Position, J.Spells[SpellSlot.E].Range));
-            }
-            if (J.Spells[SpellSlot.Q].IsReady())
-            {
-                var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon" && obj.Distance(J.Player.Position) <= J.Spells[SpellSlot.Q].Range);
-                if (objAiBase != null)
-                {
-                    J.Spells[SpellSlot.Q].Cast(objAiBase.Position);
-                    LastQ = Environment.TickCount;
-                }
-            }
 
-            //Utility.DelayAction.Add(750, () => J.Player.Spellbook.CastSpell(J.FlashSlot, target.Position));
-            if (J.Player.Spellbook.CanUseSpell(J.FlashSlot) == SpellState.Ready && Environment.TickCount - LastQ >= 150 && target.Distance(J.Player.ServerPosition) <= 390)
+            if (J.Spells[SpellSlot.E].IsReady() && J.Spells[SpellSlot.Q].IsReady())
             {
-                J.Player.Spellbook.CastSpell(J.FlashSlot, target.ServerPosition);
+                EPosition = J.Player.ServerPosition.Extend(target.ServerPosition, J.Spells[SpellSlot.E].Range);
+                J.Spells[SpellSlot.E].Cast(EPosition);
+                LastE = Environment.TickCount;
+            }
+            if (J.Spells[SpellSlot.Q].IsReady() && UsedE)
+            {
+                    J.Spells[SpellSlot.Q].Cast(EPosition);
+                    LastQ = Environment.TickCount;
+            }
+            if (J.Player.Spellbook.CanUseSpell(J.FlashSlot) == SpellState.Ready && Environment.TickCount - LastQ >= 50 && target.Distance(J.Player.Position) <= 350)
+            {
+                J.Player.Spellbook.CastSpell(J.FlashSlot, target.Position);
             }
         }
 
         public static void UseEQRCombo(Obj_AI_Hero target)
         {
-            if (!J.Spells[SpellSlot.R].IsReady())
-            {
-                return;
-            }
             UseEQ(target);
-            J.Spells[SpellSlot.R].Cast(target);
+            UseRCombo(target);
         }
 
         public static void UseWCombo(Obj_AI_Hero target)
@@ -117,11 +121,10 @@ namespace Jarvan4
 
         public static void UseRCombo(Obj_AI_Hero target)
         {
-            if (!J.Spells[SpellSlot.R].IsReady())
+            if (J.Spells[SpellSlot.R].IsReady())
             {
-                return;
+                J.Spells[SpellSlot.R].Cast(target);
             }
-            J.Spells[SpellSlot.R].Cast(target);
         }
 
         public static bool GapUsed(Obj_AI_Hero target)
@@ -145,17 +148,15 @@ namespace Jarvan4
 
         public static void UseEQFlee()
         {
-            if (J.Spells[SpellSlot.E].IsReady())
+            if (J.Spells[SpellSlot.E].IsReady() && J.Spells[SpellSlot.Q].IsReady())
             {
-                J.Spells[SpellSlot.E].Cast(J.Player.Position.Extend(Game.CursorPos, J.Spells[SpellSlot.E].Range));
+                EPosition = J.Player.ServerPosition.Extend(Game.CursorPos, J.Spells[SpellSlot.E].Range + 100f);
+                J.Spells[SpellSlot.E].Cast(EPosition);
+                LastE = Environment.TickCount;
             }
-            if (J.Spells[SpellSlot.Q].IsReady())
+            if (J.Spells[SpellSlot.Q].IsReady() && UsedE)
             {
-                var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon" && obj.Distance(J.Player.Position) < J.Spells[SpellSlot.Q].Range);
-                if (objAiBase != null)
-                {
-                    J.Spells[SpellSlot.Q].Cast(objAiBase.Position);
-                }
+                    J.Spells[SpellSlot.Q].Cast(EPosition);
             }
         }
 
@@ -165,7 +166,6 @@ namespace Jarvan4
             {
                 return;
             }
-
             var pred = J.Spells[SpellSlot.Q].GetPrediction(target);
             if (pred.Hitchance >= HitChance.High)
             {
@@ -180,14 +180,14 @@ namespace Jarvan4
                 return;
             }
 
-            var allMinions = MinionManager.GetMinions(J.Player.Position, J.Spells[SpellSlot.Q].Range);
+            var allMinions = MinionManager.GetMinions(J.Player.ServerPosition, J.Spells[SpellSlot.Q].Range);
             if (allMinions.Count < 3)
             {
                 return;
             }
             var qMinionsPositions = MinionManager.GetMinionsPredictedPositions(
                 allMinions, J.Spells[SpellSlot.Q].Delay, J.Spells[SpellSlot.Q].Width, J.Spells[SpellSlot.Q].Speed,
-                J.Player.Position, J.Spells[SpellSlot.Q].Range, false, SkillshotType.SkillshotLine);
+                J.Player.ServerPosition, J.Spells[SpellSlot.Q].Range, false, SkillshotType.SkillshotLine);
             var bestQFarm = MinionManager.GetBestLineFarmLocation(
                 qMinionsPositions, J.Spells[SpellSlot.Q].Width, J.Spells[SpellSlot.Q].Range);
             if (bestQFarm.MinionsHit > 2)
@@ -226,7 +226,7 @@ namespace Jarvan4
 
         public static void UseHydraLc()
         {
-            var minions = MinionManager.GetMinions(J.Player.Position, 420).ToArray();
+            var minions = MinionManager.GetMinions(J.Player.ServerPosition, 420).ToArray();
             if (minions.Length > 1)
             {
                 if (Items.CanUseItem(3074))
@@ -245,7 +245,7 @@ namespace Jarvan4
             //BOTRK and Cutlass
             if ((!J.Spells[SpellSlot.E].IsReady() && !J.Spells[SpellSlot.Q].IsReady() &&
                  target.Distance(J.Player) > J.Player.AttackRange + target.BoundingRadius) ||
-                J.Player.HealthPercentage() < 40)
+                J.Player.HealthPercent < 40)
             {
                 if (Items.CanUseItem(3153))
                 {

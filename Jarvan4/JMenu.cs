@@ -61,8 +61,7 @@ namespace Jarvan4
             Config.SubMenu("utils")
                 .AddItem(new MenuItem("WIncoming", "Use W on Incoming Damage (with slow check)"))
                 .SetValue(false);
-            Config.SubMenu("utils").AddItem(new MenuItem("NoRTower", "Never R under enemy tower")).SetValue(false);
-            Config.SubMenu("utils").AddItem(new MenuItem("TowerTrap", "Under tower R outplay :^)")).SetValue(false);
+            //Config.SubMenu("utils").AddItem(new MenuItem("TowerTrap", "Under tower R outplay :^)")).SetValue(false);
             Config.SubMenu("utils").AddSubMenu(new Menu("Always R", "alwR"));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
             {
@@ -85,23 +84,7 @@ namespace Jarvan4
             Config.SubMenu("utils").AddSubMenu(new Menu("Anti Gapcloser", "GC"));
             Config.SubMenu("utils").SubMenu("GC").AddItem(new MenuItem("WGap", "Use W on gapcloser")).SetValue(true);
             Config.SubMenu("utils").AddSubMenu(new Menu("Interrupter", "Inte"));
-            foreach (var interr in from interr in Interrupter.Spells
-                from enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy)
-                where interr.ChampionName == enemy.ChampionName
-                select interr)
-            {
-                Config.SubMenu("utils")
-                    .SubMenu("Inte")
-                    .AddItem(
-                        new MenuItem(
-                            "Interr" + interr.Slot + interr.ChampionName,
-                            interr.ChampionName + " " + interr.Slot.ToString()))
-                    .SetValue(true);
-            }
-            Config.SubMenu("utils")
-                .SubMenu("Inte")
-                .AddItem(new MenuItem("EQInterrupt", "Use E to interrupt important spells"))
-                .SetValue(true);
+            Config.SubMenu("utils").SubMenu("Inte").AddItem(new MenuItem("EQInterrupt", "Use EQ to interrupt important spells")).SetValue(true);
 
 
             //Drawings

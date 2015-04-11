@@ -24,15 +24,14 @@ namespace Jarvan4
         public static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719 };
         public static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714 };
         public static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707 };
+
         public static readonly string[] MinionList =
         {
-            "SRU_Razorbeak", "SRU_Krug", "Sru_Crab", "SRU_Baron", "SRU_Dragon",
-            "SRU_Blue", "SRU_Red", "SRU_Murkwolf", "SRU_Gromp"
+            "SRU_Razorbeak", "SRU_Krug", "Sru_Crab", "SRU_Baron",
+            "SRU_Dragon", "SRU_Blue", "SRU_Red", "SRU_Murkwolf", "SRU_Gromp"
         };
 
-
         public static Spell Smite;
-        public static Spell Flash;
         
         public static readonly Dictionary<SpellSlot, Spell> Spells = new Dictionary<SpellSlot, Spell> {
 	        {SpellSlot.Q, new Spell(SpellSlot.Q, 800)},
@@ -40,6 +39,7 @@ namespace Jarvan4
 	        {SpellSlot.E, new Spell(SpellSlot.E, 800)},
 	        {SpellSlot.R, new Spell(SpellSlot.R, 610)}
         };
+
         #endregion
 
         #region Orbwalkermodes
@@ -60,7 +60,7 @@ namespace Jarvan4
             }
             if (target.Distance(Player) < Spells[SpellSlot.E].Range)
                 Use.UseEQCombo(target);
-            else if (target.Distance(Player) < Spells[SpellSlot.E].Range + Spells[SpellSlot.W].Range && Spells[SpellSlot.W].IsReady() && target.HealthPercentage() < 50)
+            else if (target.Distance(Player) < Spells[SpellSlot.E].Range + Spells[SpellSlot.W].Range && target.HealthPercent < 60)
                 Use.UseEQ(target);
             if (target.Distance(Player) < Spells[SpellSlot.Q].Range)
                 Use.UseQCombo(target);
@@ -69,13 +69,6 @@ namespace Jarvan4
             if (!Use.GapUsed(target))
             {
                 return;
-            }
-            if (JMenu.Config.Item("NoRTower").GetValue<bool>())
-            {
-                var nearestTower =
-                    ObjectManager.Get<Obj_AI_Turret>().Where(turret => turret.IsEnemy && target.Distance(turret) < 775f);
-                if (!nearestTower.Any())
-                    return;
             }
             if (target.Distance(Player) < Spells[SpellSlot.R].Range &&
                 ((target.Distance(Player) > Player.AttackRange + Player.BoundingRadius && JMenu.Config.Item("R" + target.ChampionName).GetValue<bool>()) ||
@@ -114,28 +107,28 @@ namespace Jarvan4
                     .Where(
                         m =>
                             MinionList.Any(x => m.Name.StartsWith(x)) && !m.Name.StartsWith("Minion") &&
-                            !m.Name.Contains("Mini") && m.Distance(Player.Position) < Spells[SpellSlot.E].Range))
+                            !m.Name.Contains("Mini") && m.Distance(Player.ServerPosition) < Spells[SpellSlot.E].Range))
             {
                 if (Spells[SpellSlot.E].IsReady() && Spells[SpellSlot.Q].IsReady() &&
-                    JMenu.Config.Item("EQJungle").GetValue<bool>() && minion.HealthPercentage() > 20)
+                    JMenu.Config.Item("EQJungle").GetValue<bool>() && minion.HealthPercent > 20)
                 {
-                    Spells[SpellSlot.E].Cast(minion.Position);
-                    {
-                        var objAiBase = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(obj => obj.Name == "Beacon" && obj.Distance(J.Player.Position) < J.Spells[SpellSlot.Q].Range);
-                        if (objAiBase != null)
-                        {
-                            Spells[SpellSlot.Q].Cast(
-                                objAiBase.Position);
-                        }
-                    }
+                    Spells[SpellSlot.E].Cast(minion.ServerPosition);
+                    Use.EPosition = minion.ServerPosition;
+                    Use.LastE = Environment.TickCount;
+                }
+                else if (Spells[SpellSlot.Q].IsReady() && Use.UsedE)
+                {
+                    Spells[SpellSlot.Q].Cast(Use.EPosition);
                 }
                 else if (Player.Spellbook.CanUseSpell(SpellSlot.Q) == SpellState.NotLearned)
                 {
-                    Spells[SpellSlot.E].Cast(minion.Position);
+                    Spells[SpellSlot.E].Cast(minion.ServerPosition);
+                    Use.EPosition = minion.ServerPosition;
+                    Use.LastE = Environment.TickCount;
                 }
-                else if (minion.HealthPercentage() > 10)
+                else if (minion.HealthPercent > 5)
                 {
-                    Spells[SpellSlot.Q].Cast(minion.Position);
+                    Spells[SpellSlot.Q].Cast(minion.ServerPosition);
                 }
                 if (JMenu.Config.Item("WJungle").GetValue<bool>() && minion.CharacterState != GameObjectCharacterState.Asleep)
                     Spells[SpellSlot.W].Cast();
@@ -160,8 +153,8 @@ namespace Jarvan4
 
         public static void SetSkillShots()
         {
-            Spells[SpellSlot.Q].SetSkillshot(250f, 70f, 1450f, false, SkillshotType.SkillshotLine);
-            Spells[SpellSlot.E].SetSkillshot(500f, 175f, Int32.MaxValue, false, SkillshotType.SkillshotCircle);
+            Spells[SpellSlot.Q].SetSkillshot(0.5f, 70, 1450, false, SkillshotType.SkillshotLine);
+            Spells[SpellSlot.E].SetSkillshot(0.5f, 175, float.MaxValue, false, SkillshotType.SkillshotCircle);
         }
 
         public static string GetSmiteType()
