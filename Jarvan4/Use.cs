@@ -98,7 +98,7 @@ namespace Jarvan4
                     J.Spells[SpellSlot.Q].Cast(EPosition);
                     LastQ = Environment.TickCount;
             }
-            if (J.Player.Spellbook.CanUseSpell(J.FlashSlot) == SpellState.Ready && Environment.TickCount - LastQ >= 50 && target.Distance(J.Player.Position) <= 350)
+            if (J.Player.Spellbook.CanUseSpell(J.FlashSlot) == SpellState.Ready && Environment.TickCount - LastQ >= 150 && target.Distance(ObjectManager.Player.Position) <= 390 && ObjectManager.Player.Distance(EPosition) > 10)
             {
                 J.Player.Spellbook.CastSpell(J.FlashSlot, target.Position);
             }

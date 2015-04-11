@@ -65,7 +65,6 @@ namespace Jarvan4
                 if (Target.IsValidTarget())
                 {
                     Use.UseEQRCombo(Target);
-                    J.Combo(Target);
                 }
                 else
                 {
@@ -80,7 +79,6 @@ namespace Jarvan4
                 if (Target.IsValidTarget())
                 {
                     Use.UseEQFlashCombo(Target);
-                    J.Combo(Target);
                 }
                 else
                 {
