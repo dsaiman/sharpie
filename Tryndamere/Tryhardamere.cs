@@ -76,7 +76,7 @@ namespace Tryhardamere
                 Trynda.GetSmiteSlot();
 
                 Drawing.OnDraw += OnDraw;
-                Game.OnGameUpdate += OnGameUpdate;
+                Game.OnUpdate += OnGameUpdate;
 
                 Obj_AI_Base.OnProcessSpellCast += MinionSpellCast;
                 Obj_AI_Base.OnProcessSpellCast += HeroSpellCast;
