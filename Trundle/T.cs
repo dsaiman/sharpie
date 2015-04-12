@@ -57,7 +57,7 @@ namespace Trundle
             if ((!OutgoingDamage.IsMovingToMe(target) && 
                 target.Distance(ObjectManager.Player) > Orbwalking.GetRealAutoAttackRange(target)) ||
                 (target.Distance(ObjectManager.Player) <= Orbwalking.GetRealAutoAttackRange(target) && 
-                ObjectManager.Player.HealthPercentage() < 60))
+                ObjectManager.Player.HealthPercent < 60))
             {
                 Use.UseWCombo(target);
             }
@@ -67,14 +67,14 @@ namespace Trundle
                 Use.UseECombo(target);
             }
 
-            if (ObjectManager.Player.HealthPercentage() < 60 || target.Health < R.GetDamage(target) &&
+            if (ObjectManager.Player.HealthPercent < 60 || target.Health < R.GetDamage(target) &&
                 !TMenu.Config.Item("useRTanks").GetValue<bool>())
             {
                 Use.UseRCombo(target);
             }
 
-            if (ObjectManager.Player.HealthPercentage() < 70 &&
-               TMenu.Config.Item("useRTanks").GetValue<bool>() && ObjectManager.Player.CountEnemysInRange(2000f) >= 2)
+            if (ObjectManager.Player.HealthPercent < 70 &&
+               TMenu.Config.Item("useRTanks").GetValue<bool>() && ObjectManager.Player.CountEnemiesInRange(2000f) >= 2)
             {
                 Use.UseRTanks();
             }

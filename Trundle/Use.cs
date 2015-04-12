@@ -121,7 +121,7 @@ namespace Trundle
             //BOTRK and Cutlass
             if ((!T.E.IsReady() &&
                  target.Distance(T.Player) > T.Player.AttackRange + target.BoundingRadius) ||
-                T.Player.HealthPercentage() < 40)
+                T.Player.HealthPercent < 40)
             {
                 if (Items.CanUseItem(3153))
                 {
