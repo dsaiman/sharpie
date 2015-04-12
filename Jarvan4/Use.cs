@@ -11,6 +11,7 @@ namespace Jarvan4
 
         public static int LastQ;
         public static int LastE;
+        public static int LastR = Environment.TickCount;
         public static bool UsedE = false;
         public static bool UsedQ = false;
         public static bool R1Up = false;
@@ -93,14 +94,15 @@ namespace Jarvan4
                 J.Spells[SpellSlot.E].Cast(EPosition);
                 LastE = Environment.TickCount;
             }
+            var eqRectangle = new Geometry.Polygon.Rectangle(J.Player.ServerPosition, EPosition, 180);
             if (J.Spells[SpellSlot.Q].IsReady() && UsedE)
             {
                     J.Spells[SpellSlot.Q].Cast(EPosition);
                     LastQ = Environment.TickCount;
             }
-            if (J.Player.Spellbook.CanUseSpell(J.FlashSlot) == SpellState.Ready && Environment.TickCount - LastQ >= 150 && target.Distance(ObjectManager.Player.Position) <= 390 && ObjectManager.Player.Distance(EPosition) > 10)
+            if (J.Player.Spellbook.CanUseSpell(J.FlashSlot) == SpellState.Ready && Environment.TickCount - LastQ >= 50 && target.Distance(ObjectManager.Player.ServerPosition) <= 410 && ObjectManager.Player.IsDashing() && !eqRectangle.IsInside(target.ServerPosition))
             {
-                J.Player.Spellbook.CastSpell(J.FlashSlot, target.Position);
+                J.Player.Spellbook.CastSpell(J.FlashSlot, target.ServerPosition);
             }
         }
 
@@ -121,7 +123,7 @@ namespace Jarvan4
 
         public static void UseRCombo(Obj_AI_Hero target)
         {
-            if (J.Spells[SpellSlot.R].IsReady())
+            if (J.Spells[SpellSlot.R].IsReady() && ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(ob => ob.Name.Contains("Wall")) == null)
             {
                 J.Spells[SpellSlot.R].Cast(target);
             }

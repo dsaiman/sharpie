@@ -58,9 +58,9 @@ namespace Jarvan4
             {
                 Use.UseSmiteOnChamp(target);
             }
-            if (target.Distance(Player) < Spells[SpellSlot.E].Range)
+            if (target.Distance(Player) < Spells[SpellSlot.E].Range && Spells[SpellSlot.E].IsReady())
                 Use.UseEQCombo(target);
-            else if (target.Distance(Player) < Spells[SpellSlot.E].Range + Spells[SpellSlot.W].Range && target.HealthPercent < 60)
+            else if (target.Distance(Player) < Spells[SpellSlot.E].Range + Spells[SpellSlot.W].Range && target.HealthPercent < 60 && Spells[SpellSlot.E].IsReady())
                 Use.UseEQ(target);
             if (target.Distance(Player) < Spells[SpellSlot.Q].Range)
                 Use.UseQCombo(target);

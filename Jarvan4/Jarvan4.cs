@@ -65,6 +65,8 @@ namespace Jarvan4
                 if (Target.IsValidTarget())
                 {
                     Use.UseEQRCombo(Target);
+                    Orbwalking.Orbwalk(Target, Game.CursorPos);
+                    J.Combo(Target);
                 }
                 else
                 {
@@ -74,11 +76,13 @@ namespace Jarvan4
 
             if (JMenu.Config.Item("EQFlash").GetValue<KeyBind>().Active)
             {
-                var fullRange = J.Spells[SpellSlot.E].Range + 400;
+                var fullRange = J.Spells[SpellSlot.E].Range + 430;
                 Target = TargetSelector.GetTarget(fullRange, TargetSelector.DamageType.Physical);
                 if (Target.IsValidTarget())
                 {
                     Use.UseEQFlashCombo(Target);
+                    Orbwalking.Orbwalk(Target, Game.CursorPos);
+                    J.Combo(Target);
                 }
                 else
                 {
